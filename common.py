@@ -3,7 +3,8 @@ from pathlib import Path
 import pandas as pd
 import streamlit as st
 
-DATA = Path(__file__).parent / 'dashboard_data'
+_BASE = Path(__file__).parent
+DATA = _BASE / 'dashboard_data' if (_BASE / 'dashboard_data').exists() else _BASE
 
 BRAND = '#0064DC'
 SURFACE = '#0E1117'
