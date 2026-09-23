@@ -1,0 +1,445 @@
+city_grp,device,Transaction_Type,payment_mode,package,labelled,retained
+Faisalabad,Android,Bill Payment,Manual,Monthly,10,2
+Faisalabad,Android,Bill Payment,Manual,Quarterly,1,0
+Faisalabad,Android,Bill Payment,Manual,Weekly,28,1
+Faisalabad,Android,Credit/Debit Card,Manual,Half Yearly,3,1
+Faisalabad,Android,Credit/Debit Card,Manual,Monthly,71,6
+Faisalabad,Android,Credit/Debit Card,Manual,Weekly,125,15
+Faisalabad,Android,Easypaisa,Auto,Half Yearly,1,1
+Faisalabad,Android,Easypaisa,Auto,Monthly,163,44
+Faisalabad,Android,Easypaisa,Auto,Quarterly,9,4
+Faisalabad,Android,Easypaisa,Auto,Weekly,767,419
+Faisalabad,Android,JazzCash,Manual,Monthly,136,10
+Faisalabad,Android,JazzCash,Manual,Quarterly,1,1
+Faisalabad,Android,JazzCash,Manual,Weekly,43,3
+Faisalabad,Android,JazzCash Checkout,Auto,Half Yearly,16,9
+Faisalabad,Android,JazzCash Checkout,Auto,Monthly,319,217
+Faisalabad,Android,JazzCash Checkout,Auto,Quarterly,47,36
+Faisalabad,Android,JazzCash Checkout,Auto,Weekly,3998,3039
+Faisalabad,Android,Ufone,Auto,Monthly,28,28
+Faisalabad,Android,Ufone,Auto,Weekly,91,61
+Faisalabad,Android,Zindigi,Manual,Monthly,3,0
+Faisalabad,Android,Zindigi,Manual,Weekly,2,0
+Faisalabad,Android,Zong,Auto,Weekly,128,57
+Faisalabad,Unknown,Bill Payment,Manual,Weekly,1,0
+Faisalabad,Unknown,Credit/Debit Card,Manual,Weekly,1,0
+Faisalabad,Unknown,Easypaisa,Auto,Monthly,3,2
+Faisalabad,Unknown,Easypaisa,Auto,Weekly,19,15
+Faisalabad,Unknown,JazzCash,Manual,Monthly,1,0
+Faisalabad,Unknown,JazzCash Checkout,Auto,Monthly,9,5
+Faisalabad,Unknown,JazzCash Checkout,Auto,Weekly,40,31
+Faisalabad,Unknown,JazzWorld,Manual,Monthly,7,0
+Faisalabad,Unknown,JazzWorld,Manual,Weekly,3,0
+Faisalabad,Unknown,Ufone,Auto,Weekly,1,0
+Faisalabad,iOS,Bill Payment,Manual,Monthly,8,0
+Faisalabad,iOS,Bill Payment,Manual,Weekly,13,1
+Faisalabad,iOS,Credit/Debit Card,Manual,Half Yearly,2,0
+Faisalabad,iOS,Credit/Debit Card,Manual,Monthly,43,3
+Faisalabad,iOS,Credit/Debit Card,Manual,Quarterly,1,0
+Faisalabad,iOS,Credit/Debit Card,Manual,Weekly,60,6
+Faisalabad,iOS,Easypaisa,Auto,Half Yearly,1,1
+Faisalabad,iOS,Easypaisa,Auto,Monthly,64,22
+Faisalabad,iOS,Easypaisa,Auto,Quarterly,1,0
+Faisalabad,iOS,Easypaisa,Auto,Weekly,229,123
+Faisalabad,iOS,JazzCash,Manual,Monthly,62,8
+Faisalabad,iOS,JazzCash,Manual,Weekly,15,0
+Faisalabad,iOS,JazzCash Checkout,Auto,Half Yearly,4,4
+Faisalabad,iOS,JazzCash Checkout,Auto,Monthly,142,107
+Faisalabad,iOS,JazzCash Checkout,Auto,Quarterly,24,19
+Faisalabad,iOS,JazzCash Checkout,Auto,Weekly,1802,1379
+Faisalabad,iOS,Ufone,Auto,Monthly,4,1
+Faisalabad,iOS,Ufone,Auto,Weekly,147,130
+Faisalabad,iOS,Zindigi,Manual,Monthly,1,1
+Faisalabad,iOS,Zindigi,Manual,Weekly,2,2
+Faisalabad,iOS,Zong,Auto,Weekly,67,31
+Islamabad,Android,Bill Payment,Manual,Half Yearly,1,0
+Islamabad,Android,Bill Payment,Manual,Monthly,34,6
+Islamabad,Android,Bill Payment,Manual,Quarterly,1,0
+Islamabad,Android,Bill Payment,Manual,Weekly,64,5
+Islamabad,Android,Credit/Debit Card,Manual,Half Yearly,5,0
+Islamabad,Android,Credit/Debit Card,Manual,Monthly,118,19
+Islamabad,Android,Credit/Debit Card,Manual,Quarterly,1,0
+Islamabad,Android,Credit/Debit Card,Manual,Weekly,111,26
+Islamabad,Android,Easypaisa,Auto,Half Yearly,9,6
+Islamabad,Android,Easypaisa,Auto,Monthly,362,119
+Islamabad,Android,Easypaisa,Auto,Quarterly,12,4
+Islamabad,Android,Easypaisa,Auto,Weekly,1263,752
+Islamabad,Android,JazzCash,Manual,Monthly,51,10
+Islamabad,Android,JazzCash,Manual,Weekly,27,2
+Islamabad,Android,JazzCash Checkout,Auto,Half Yearly,7,5
+Islamabad,Android,JazzCash Checkout,Auto,Monthly,153,98
+Islamabad,Android,JazzCash Checkout,Auto,Quarterly,21,15
+Islamabad,Android,JazzCash Checkout,Auto,Weekly,905,583
+Islamabad,Android,Ufone,Auto,Monthly,116,103
+Islamabad,Android,Ufone,Auto,Weekly,665,578
+Islamabad,Android,Zindigi,Manual,Monthly,3,0
+Islamabad,Android,Zindigi,Manual,Weekly,1,0
+Islamabad,Android,Zong,Auto,Monthly,3,0
+Islamabad,Android,Zong,Auto,Weekly,54,27
+Islamabad,Unknown,Bill Payment,Manual,Monthly,3,0
+Islamabad,Unknown,Bill Payment,Manual,Weekly,1,0
+Islamabad,Unknown,Credit/Debit Card,Manual,Monthly,2,0
+Islamabad,Unknown,Credit/Debit Card,Manual,Weekly,5,1
+Islamabad,Unknown,Easypaisa,Auto,Monthly,11,9
+Islamabad,Unknown,Easypaisa,Auto,Weekly,52,27
+Islamabad,Unknown,JazzCash Checkout,Auto,Weekly,12,2
+Islamabad,Unknown,JazzWorld,Manual,Monthly,17,0
+Islamabad,Unknown,JazzWorld,Manual,Weekly,4,0
+Islamabad,Unknown,Ufone,Auto,Monthly,7,7
+Islamabad,Unknown,Ufone,Auto,Weekly,3,2
+Islamabad,Unknown,Zong,Auto,Quarterly,1,1
+Islamabad,Unknown,Zong,Auto,Weekly,1,0
+Islamabad,iOS,Bill Payment,Manual,Monthly,18,1
+Islamabad,iOS,Bill Payment,Manual,Weekly,24,0
+Islamabad,iOS,Credit/Debit Card,Manual,Half Yearly,4,0
+Islamabad,iOS,Credit/Debit Card,Manual,Monthly,68,6
+Islamabad,iOS,Credit/Debit Card,Manual,Quarterly,3,0
+Islamabad,iOS,Credit/Debit Card,Manual,Weekly,62,11
+Islamabad,iOS,Easypaisa,Auto,Half Yearly,9,5
+Islamabad,iOS,Easypaisa,Auto,Monthly,157,77
+Islamabad,iOS,Easypaisa,Auto,Quarterly,6,3
+Islamabad,iOS,Easypaisa,Auto,Weekly,320,218
+Islamabad,iOS,JazzCash,Manual,Half Yearly,1,0
+Islamabad,iOS,JazzCash,Manual,Monthly,21,1
+Islamabad,iOS,JazzCash,Manual,Weekly,3,0
+Islamabad,iOS,JazzCash Checkout,Auto,Half Yearly,2,1
+Islamabad,iOS,JazzCash Checkout,Auto,Monthly,48,30
+Islamabad,iOS,JazzCash Checkout,Auto,Quarterly,4,2
+Islamabad,iOS,JazzCash Checkout,Auto,Weekly,444,359
+Islamabad,iOS,Ufone,Auto,Monthly,35,32
+Islamabad,iOS,Ufone,Auto,Weekly,254,217
+Islamabad,iOS,Zindigi,Manual,Monthly,1,1
+Islamabad,iOS,Zindigi,Manual,Weekly,1,0
+Islamabad,iOS,Zong,Auto,Half Yearly,1,1
+Islamabad,iOS,Zong,Auto,Monthly,1,0
+Islamabad,iOS,Zong,Auto,Weekly,15,3
+Karachi,Android,Bill Payment,Manual,Half Yearly,21,0
+Karachi,Android,Bill Payment,Manual,Monthly,287,28
+Karachi,Android,Bill Payment,Manual,Quarterly,10,1
+Karachi,Android,Bill Payment,Manual,Weekly,437,36
+Karachi,Android,Coupon,Manual,Weekly,6,0
+Karachi,Android,Credit/Debit Card,Manual,Half Yearly,26,7
+Karachi,Android,Credit/Debit Card,Manual,Monthly,862,87
+Karachi,Android,Credit/Debit Card,Manual,Quarterly,31,5
+Karachi,Android,Credit/Debit Card,Manual,Weekly,1237,243
+Karachi,Android,Easypaisa,Auto,Half Yearly,40,20
+Karachi,Android,Easypaisa,Auto,Monthly,1644,593
+Karachi,Android,Easypaisa,Auto,Quarterly,70,45
+Karachi,Android,Easypaisa,Auto,Weekly,5886,3460
+Karachi,Android,JazzCash,Manual,Half Yearly,3,2
+Karachi,Android,JazzCash,Manual,Monthly,285,23
+Karachi,Android,JazzCash,Manual,Quarterly,1,0
+Karachi,Android,JazzCash,Manual,Weekly,89,7
+Karachi,Android,JazzCash Checkout,Auto,Half Yearly,23,13
+Karachi,Android,JazzCash Checkout,Auto,Monthly,727,450
+Karachi,Android,JazzCash Checkout,Auto,Quarterly,55,39
+Karachi,Android,JazzCash Checkout,Auto,Weekly,5314,3641
+Karachi,Android,Ufone,Auto,Monthly,263,227
+Karachi,Android,Ufone,Auto,Weekly,3164,2552
+Karachi,Android,Zindigi,Manual,Monthly,17,2
+Karachi,Android,Zindigi,Manual,Weekly,20,0
+Karachi,Android,Zong,Auto,Half Yearly,1,0
+Karachi,Android,Zong,Auto,Monthly,7,0
+Karachi,Android,Zong,Auto,Weekly,421,196
+Karachi,Unknown,Bill Payment,Manual,Monthly,2,0
+Karachi,Unknown,Bill Payment,Manual,Weekly,10,2
+Karachi,Unknown,Credit/Debit Card,Manual,Monthly,20,0
+Karachi,Unknown,Credit/Debit Card,Manual,Weekly,33,2
+Karachi,Unknown,Easypaisa,Auto,Monthly,65,29
+Karachi,Unknown,Easypaisa,Auto,Weekly,167,106
+Karachi,Unknown,JazzCash,Manual,Monthly,3,1
+Karachi,Unknown,JazzCash Checkout,Auto,Monthly,10,5
+Karachi,Unknown,JazzCash Checkout,Auto,Weekly,69,47
+Karachi,Unknown,JazzWorld,Manual,Monthly,46,9
+Karachi,Unknown,JazzWorld,Manual,Weekly,16,1
+Karachi,Unknown,Ufone,Auto,Weekly,4,0
+Karachi,Unknown,Zindigi,Manual,Weekly,1,0
+Karachi,Unknown,Zong,Auto,Weekly,2,1
+Karachi,iOS,Bill Payment,Manual,Half Yearly,6,0
+Karachi,iOS,Bill Payment,Manual,Monthly,103,6
+Karachi,iOS,Bill Payment,Manual,Quarterly,7,0
+Karachi,iOS,Bill Payment,Manual,Weekly,144,14
+Karachi,iOS,Coupon,Manual,Weekly,3,0
+Karachi,iOS,Credit/Debit Card,Manual,Half Yearly,12,2
+Karachi,iOS,Credit/Debit Card,Manual,Monthly,331,28
+Karachi,iOS,Credit/Debit Card,Manual,Quarterly,17,1
+Karachi,iOS,Credit/Debit Card,Manual,Weekly,493,82
+Karachi,iOS,Easypaisa,Auto,Half Yearly,16,9
+Karachi,iOS,Easypaisa,Auto,Monthly,421,162
+Karachi,iOS,Easypaisa,Auto,Quarterly,28,20
+Karachi,iOS,Easypaisa,Auto,Weekly,1196,686
+Karachi,iOS,JazzCash,Manual,Half Yearly,1,0
+Karachi,iOS,JazzCash,Manual,Monthly,80,7
+Karachi,iOS,JazzCash,Manual,Weekly,29,3
+Karachi,iOS,JazzCash Checkout,Auto,Half Yearly,12,7
+Karachi,iOS,JazzCash Checkout,Auto,Monthly,236,148
+Karachi,iOS,JazzCash Checkout,Auto,Quarterly,34,23
+Karachi,iOS,JazzCash Checkout,Auto,Weekly,1984,1434
+Karachi,iOS,Ufone,Auto,Monthly,118,95
+Karachi,iOS,Ufone,Auto,Weekly,1171,952
+Karachi,iOS,Zindigi,Manual,Monthly,2,0
+Karachi,iOS,Zindigi,Manual,Weekly,2,0
+Karachi,iOS,Zong,Auto,Half Yearly,2,1
+Karachi,iOS,Zong,Auto,Monthly,7,1
+Karachi,iOS,Zong,Auto,Quarterly,1,0
+Karachi,iOS,Zong,Auto,Weekly,89,38
+Lahore,Android,Bill Payment,Manual,Half Yearly,3,0
+Lahore,Android,Bill Payment,Manual,Monthly,157,27
+Lahore,Android,Bill Payment,Manual,Quarterly,7,2
+Lahore,Android,Bill Payment,Manual,Weekly,244,24
+Lahore,Android,Credit/Debit Card,Manual,Half Yearly,7,1
+Lahore,Android,Credit/Debit Card,Manual,Monthly,476,45
+Lahore,Android,Credit/Debit Card,Manual,Quarterly,6,1
+Lahore,Android,Credit/Debit Card,Manual,Weekly,646,96
+Lahore,Android,Easypaisa,Auto,Half Yearly,24,12
+Lahore,Android,Easypaisa,Auto,Monthly,932,298
+Lahore,Android,Easypaisa,Auto,Quarterly,34,17
+Lahore,Android,Easypaisa,Auto,Weekly,3886,2193
+Lahore,Android,JazzCash,Manual,Half Yearly,2,0
+Lahore,Android,JazzCash,Manual,Monthly,584,72
+Lahore,Android,JazzCash,Manual,Quarterly,4,2
+Lahore,Android,JazzCash,Manual,Weekly,217,19
+Lahore,Android,JazzCash Checkout,Auto,Half Yearly,63,46
+Lahore,Android,JazzCash Checkout,Auto,Monthly,1411,942
+Lahore,Android,JazzCash Checkout,Auto,Quarterly,130,89
+Lahore,Android,JazzCash Checkout,Auto,Weekly,15568,11602
+Lahore,Android,Ufone,Auto,Monthly,161,127
+Lahore,Android,Ufone,Auto,Weekly,2101,1675
+Lahore,Android,Zindigi,Manual,Monthly,20,0
+Lahore,Android,Zindigi,Manual,Weekly,30,1
+Lahore,Android,Zong,Auto,Monthly,10,4
+Lahore,Android,Zong,Auto,Quarterly,2,1
+Lahore,Android,Zong,Auto,Weekly,396,169
+Lahore,Unknown,Bill Payment,Manual,Monthly,3,0
+Lahore,Unknown,Bill Payment,Manual,Weekly,9,1
+Lahore,Unknown,Credit/Debit Card,Manual,Monthly,16,0
+Lahore,Unknown,Credit/Debit Card,Manual,Quarterly,1,0
+Lahore,Unknown,Credit/Debit Card,Manual,Weekly,21,1
+Lahore,Unknown,Easypaisa,Auto,Monthly,46,12
+Lahore,Unknown,Easypaisa,Auto,Quarterly,3,3
+Lahore,Unknown,Easypaisa,Auto,Weekly,140,81
+Lahore,Unknown,JazzCash,Manual,Monthly,8,0
+Lahore,Unknown,JazzCash Checkout,Auto,Monthly,15,6
+Lahore,Unknown,JazzCash Checkout,Auto,Quarterly,1,1
+Lahore,Unknown,JazzCash Checkout,Auto,Weekly,315,248
+Lahore,Unknown,JazzWorld,Manual,Monthly,23,2
+Lahore,Unknown,JazzWorld,Manual,Weekly,12,4
+Lahore,Unknown,Ufone,Auto,Monthly,12,8
+Lahore,Unknown,Ufone,Auto,Weekly,10,2
+Lahore,Unknown,Zindigi,Manual,Monthly,1,0
+Lahore,Unknown,Zong,Auto,Weekly,21,13
+Lahore,iOS,Bill Payment,Manual,Half Yearly,7,0
+Lahore,iOS,Bill Payment,Manual,Monthly,132,9
+Lahore,iOS,Bill Payment,Manual,Quarterly,8,0
+Lahore,iOS,Bill Payment,Manual,Weekly,222,13
+Lahore,iOS,Coupon,Manual,Monthly,1,0
+Lahore,iOS,Credit/Debit Card,Manual,Half Yearly,8,0
+Lahore,iOS,Credit/Debit Card,Manual,Monthly,422,35
+Lahore,iOS,Credit/Debit Card,Manual,Quarterly,18,1
+Lahore,iOS,Credit/Debit Card,Manual,Weekly,544,107
+Lahore,iOS,Easypaisa,Auto,Half Yearly,10,8
+Lahore,iOS,Easypaisa,Auto,Monthly,574,220
+Lahore,iOS,Easypaisa,Auto,Quarterly,24,15
+Lahore,iOS,Easypaisa,Auto,Weekly,2018,1232
+Lahore,iOS,JazzCash,Manual,Half Yearly,5,0
+Lahore,iOS,JazzCash,Manual,Monthly,311,22
+Lahore,iOS,JazzCash,Manual,Quarterly,1,0
+Lahore,iOS,JazzCash,Manual,Weekly,102,7
+Lahore,iOS,JazzCash Checkout,Auto,Half Yearly,41,31
+Lahore,iOS,JazzCash Checkout,Auto,Monthly,841,597
+Lahore,iOS,JazzCash Checkout,Auto,Quarterly,77,55
+Lahore,iOS,JazzCash Checkout,Auto,Weekly,9069,7031
+Lahore,iOS,Ufone,Auto,Monthly,77,63
+Lahore,iOS,Ufone,Auto,Weekly,1291,1080
+Lahore,iOS,Zindigi,Manual,Monthly,5,0
+Lahore,iOS,Zindigi,Manual,Quarterly,1,0
+Lahore,iOS,Zindigi,Manual,Weekly,9,2
+Lahore,iOS,Zong,Auto,Monthly,6,1
+Lahore,iOS,Zong,Auto,Quarterly,1,0
+Lahore,iOS,Zong,Auto,Weekly,290,159
+Multan,Android,Bill Payment,Manual,Monthly,26,2
+Multan,Android,Bill Payment,Manual,Quarterly,3,0
+Multan,Android,Bill Payment,Manual,Weekly,53,3
+Multan,Android,Credit/Debit Card,Manual,Half Yearly,2,0
+Multan,Android,Credit/Debit Card,Manual,Monthly,109,15
+Multan,Android,Credit/Debit Card,Manual,Quarterly,2,0
+Multan,Android,Credit/Debit Card,Manual,Weekly,195,27
+Multan,Android,Easypaisa,Auto,Half Yearly,4,2
+Multan,Android,Easypaisa,Auto,Monthly,251,50
+Multan,Android,Easypaisa,Auto,Quarterly,4,2
+Multan,Android,Easypaisa,Auto,Weekly,1163,558
+Multan,Android,JazzCash,Manual,Monthly,216,12
+Multan,Android,JazzCash,Manual,Quarterly,1,0
+Multan,Android,JazzCash,Manual,Weekly,116,11
+Multan,Android,JazzCash Checkout,Auto,Half Yearly,8,5
+Multan,Android,JazzCash Checkout,Auto,Monthly,289,174
+Multan,Android,JazzCash Checkout,Auto,Quarterly,15,10
+Multan,Android,JazzCash Checkout,Auto,Weekly,6144,4514
+Multan,Android,Ufone,Auto,Monthly,21,20
+Multan,Android,Ufone,Auto,Weekly,293,245
+Multan,Android,Zindigi,Manual,Monthly,4,0
+Multan,Android,Zindigi,Manual,Weekly,8,1
+Multan,Android,Zong,Auto,Weekly,82,26
+Multan,Unknown,Bill Payment,Manual,Monthly,1,0
+Multan,Unknown,Bill Payment,Manual,Weekly,1,0
+Multan,Unknown,Credit/Debit Card,Manual,Monthly,6,0
+Multan,Unknown,Credit/Debit Card,Manual,Weekly,5,0
+Multan,Unknown,Easypaisa,Auto,Monthly,6,2
+Multan,Unknown,Easypaisa,Auto,Weekly,24,14
+Multan,Unknown,JazzCash,Manual,Weekly,1,0
+Multan,Unknown,JazzCash Checkout,Auto,Monthly,9,7
+Multan,Unknown,JazzCash Checkout,Auto,Weekly,97,68
+Multan,Unknown,JazzWorld,Manual,Monthly,4,0
+Multan,Unknown,JazzWorld,Manual,Weekly,3,0
+Multan,iOS,Bill Payment,Manual,Monthly,11,2
+Multan,iOS,Bill Payment,Manual,Quarterly,2,0
+Multan,iOS,Bill Payment,Manual,Weekly,17,1
+Multan,iOS,Credit/Debit Card,Manual,Monthly,32,1
+Multan,iOS,Credit/Debit Card,Manual,Quarterly,2,1
+Multan,iOS,Credit/Debit Card,Manual,Weekly,49,8
+Multan,iOS,Easypaisa,Auto,Half Yearly,1,0
+Multan,iOS,Easypaisa,Auto,Monthly,60,14
+Multan,iOS,Easypaisa,Auto,Quarterly,1,0
+Multan,iOS,Easypaisa,Auto,Weekly,187,124
+Multan,iOS,JazzCash,Manual,Monthly,37,4
+Multan,iOS,JazzCash,Manual,Weekly,17,1
+Multan,iOS,JazzCash Checkout,Auto,Half Yearly,3,2
+Multan,iOS,JazzCash Checkout,Auto,Monthly,91,63
+Multan,iOS,JazzCash Checkout,Auto,Quarterly,8,4
+Multan,iOS,JazzCash Checkout,Auto,Weekly,1078,820
+Multan,iOS,Ufone,Auto,Weekly,103,78
+Multan,iOS,Zindigi,Manual,Weekly,1,0
+Multan,iOS,Zong,Auto,Weekly,39,6
+Other,Android,Bill Payment,Manual,Half Yearly,8,0
+Other,Android,Bill Payment,Manual,Monthly,204,24
+Other,Android,Bill Payment,Manual,Quarterly,8,0
+Other,Android,Bill Payment,Manual,Weekly,412,29
+Other,Android,Coupon,Manual,Weekly,1,0
+Other,Android,Credit/Debit Card,Manual,Half Yearly,11,1
+Other,Android,Credit/Debit Card,Manual,Monthly,547,45
+Other,Android,Credit/Debit Card,Manual,Quarterly,13,1
+Other,Android,Credit/Debit Card,Manual,Weekly,814,111
+Other,Android,Easypaisa,Auto,Half Yearly,42,21
+Other,Android,Easypaisa,Auto,Monthly,1901,729
+Other,Android,Easypaisa,Auto,Quarterly,81,50
+Other,Android,Easypaisa,Auto,Weekly,8954,5255
+Other,Android,JazzCash,Manual,Half Yearly,2,0
+Other,Android,JazzCash,Manual,Monthly,643,53
+Other,Android,JazzCash,Manual,Quarterly,3,0
+Other,Android,JazzCash,Manual,Weekly,269,22
+Other,Android,JazzCash Checkout,Auto,Half Yearly,47,29
+Other,Android,JazzCash Checkout,Auto,Monthly,1502,1019
+Other,Android,JazzCash Checkout,Auto,Quarterly,147,92
+Other,Android,JazzCash Checkout,Auto,Weekly,19304,13972
+Other,Android,Ufone,Auto,Monthly,132,102
+Other,Android,Ufone,Auto,Weekly,1870,1459
+Other,Android,Zindigi,Manual,Monthly,24,0
+Other,Android,Zindigi,Manual,Quarterly,1,0
+Other,Android,Zindigi,Manual,Weekly,30,2
+Other,Android,Zong,Auto,Monthly,20,7
+Other,Android,Zong,Auto,Quarterly,1,0
+Other,Android,Zong,Auto,Weekly,507,233
+Other,Unknown,Bill Payment,Manual,Monthly,21,3
+Other,Unknown,Bill Payment,Manual,Quarterly,1,0
+Other,Unknown,Bill Payment,Manual,Weekly,34,1
+Other,Unknown,Coupon,Manual,Weekly,1,0
+Other,Unknown,Credit/Debit Card,Manual,Half Yearly,1,0
+Other,Unknown,Credit/Debit Card,Manual,Monthly,14,1
+Other,Unknown,Credit/Debit Card,Manual,Quarterly,2,0
+Other,Unknown,Credit/Debit Card,Manual,Weekly,45,4
+Other,Unknown,Easypaisa,Auto,Monthly,322,107
+Other,Unknown,Easypaisa,Auto,Weekly,958,593
+Other,Unknown,JazzCash,Manual,Monthly,3,1
+Other,Unknown,JazzCash,Manual,Weekly,2,0
+Other,Unknown,JazzCash Checkout,Auto,Monthly,20,13
+Other,Unknown,JazzCash Checkout,Auto,Quarterly,2,1
+Other,Unknown,JazzCash Checkout,Auto,Weekly,363,251
+Other,Unknown,JazzWorld,Manual,Monthly,160,8
+Other,Unknown,JazzWorld,Manual,Weekly,112,3
+Other,Unknown,Ufone,Auto,Monthly,192,162
+Other,Unknown,Ufone,Auto,Weekly,1187,962
+Other,Unknown,Zindigi,Manual,Monthly,1,0
+Other,Unknown,Zindigi,Manual,Weekly,7,0
+Other,Unknown,Zong,Auto,Monthly,46,32
+Other,Unknown,Zong,Auto,Weekly,404,229
+Other,iOS,Bill Payment,Manual,Half Yearly,5,1
+Other,iOS,Bill Payment,Manual,Monthly,134,13
+Other,iOS,Bill Payment,Manual,Quarterly,7,0
+Other,iOS,Bill Payment,Manual,Weekly,217,17
+Other,iOS,Credit/Debit Card,Manual,Half Yearly,4,0
+Other,iOS,Credit/Debit Card,Manual,Monthly,383,34
+Other,iOS,Credit/Debit Card,Manual,Quarterly,15,1
+Other,iOS,Credit/Debit Card,Manual,Weekly,520,90
+Other,iOS,Easypaisa,Auto,Half Yearly,23,11
+Other,iOS,Easypaisa,Auto,Monthly,741,259
+Other,iOS,Easypaisa,Auto,Quarterly,28,14
+Other,iOS,Easypaisa,Auto,Weekly,2460,1494
+Other,iOS,JazzCash,Manual,Half Yearly,2,0
+Other,iOS,JazzCash,Manual,Monthly,258,25
+Other,iOS,JazzCash,Manual,Weekly,79,8
+Other,iOS,JazzCash Checkout,Auto,Half Yearly,33,19
+Other,iOS,JazzCash Checkout,Auto,Monthly,648,416
+Other,iOS,JazzCash Checkout,Auto,Quarterly,65,48
+Other,iOS,JazzCash Checkout,Auto,Weekly,7138,5352
+Other,iOS,Ufone,Auto,Monthly,59,42
+Other,iOS,Ufone,Auto,Weekly,834,691
+Other,iOS,Zindigi,Manual,Monthly,7,0
+Other,iOS,Zindigi,Manual,Weekly,6,1
+Other,iOS,Zong,Auto,Half Yearly,1,0
+Other,iOS,Zong,Auto,Monthly,6,1
+Other,iOS,Zong,Auto,Weekly,233,111
+Rawalpindi,Android,Bill Payment,Manual,Monthly,50,6
+Rawalpindi,Android,Bill Payment,Manual,Quarterly,1,0
+Rawalpindi,Android,Bill Payment,Manual,Weekly,54,5
+Rawalpindi,Android,Credit/Debit Card,Manual,Half Yearly,1,0
+Rawalpindi,Android,Credit/Debit Card,Manual,Monthly,105,11
+Rawalpindi,Android,Credit/Debit Card,Manual,Quarterly,3,0
+Rawalpindi,Android,Credit/Debit Card,Manual,Weekly,110,25
+Rawalpindi,Android,Easypaisa,Auto,Half Yearly,9,8
+Rawalpindi,Android,Easypaisa,Auto,Monthly,440,179
+Rawalpindi,Android,Easypaisa,Auto,Quarterly,14,8
+Rawalpindi,Android,Easypaisa,Auto,Weekly,1521,963
+Rawalpindi,Android,JazzCash,Manual,Monthly,58,5
+Rawalpindi,Android,JazzCash,Manual,Weekly,21,3
+Rawalpindi,Android,JazzCash Checkout,Auto,Half Yearly,1,1
+Rawalpindi,Android,JazzCash Checkout,Auto,Monthly,123,73
+Rawalpindi,Android,JazzCash Checkout,Auto,Quarterly,8,4
+Rawalpindi,Android,JazzCash Checkout,Auto,Weekly,1234,853
+Rawalpindi,Android,Ufone,Auto,Monthly,75,67
+Rawalpindi,Android,Ufone,Auto,Weekly,433,356
+Rawalpindi,Android,Zindigi,Manual,Monthly,5,0
+Rawalpindi,Android,Zindigi,Manual,Weekly,16,2
+Rawalpindi,Android,Zong,Auto,Half Yearly,1,0
+Rawalpindi,Android,Zong,Auto,Quarterly,1,0
+Rawalpindi,Android,Zong,Auto,Weekly,117,83
+Rawalpindi,Unknown,Bill Payment,Manual,Monthly,4,1
+Rawalpindi,Unknown,Bill Payment,Manual,Weekly,5,2
+Rawalpindi,Unknown,Credit/Debit Card,Manual,Monthly,3,1
+Rawalpindi,Unknown,Credit/Debit Card,Manual,Quarterly,1,0
+Rawalpindi,Unknown,Credit/Debit Card,Manual,Weekly,7,1
+Rawalpindi,Unknown,Easypaisa,Auto,Monthly,14,5
+Rawalpindi,Unknown,Easypaisa,Auto,Weekly,68,47
+Rawalpindi,Unknown,JazzCash,Manual,Monthly,1,0
+Rawalpindi,Unknown,JazzCash Checkout,Auto,Weekly,38,31
+Rawalpindi,Unknown,Zong,Auto,Weekly,1,1
+Rawalpindi,iOS,Bill Payment,Manual,Monthly,20,5
+Rawalpindi,iOS,Bill Payment,Manual,Quarterly,1,0
+Rawalpindi,iOS,Bill Payment,Manual,Weekly,36,6
+Rawalpindi,iOS,Credit/Debit Card,Manual,Half Yearly,1,0
+Rawalpindi,iOS,Credit/Debit Card,Manual,Monthly,82,9
+Rawalpindi,iOS,Credit/Debit Card,Manual,Quarterly,1,0
+Rawalpindi,iOS,Credit/Debit Card,Manual,Weekly,75,22
+Rawalpindi,iOS,Easypaisa,Auto,Half Yearly,3,2
+Rawalpindi,iOS,Easypaisa,Auto,Monthly,165,72
+Rawalpindi,iOS,Easypaisa,Auto,Quarterly,11,7
+Rawalpindi,iOS,Easypaisa,Auto,Weekly,484,311
+Rawalpindi,iOS,JazzCash,Manual,Monthly,19,1
+Rawalpindi,iOS,JazzCash,Manual,Weekly,7,0
+Rawalpindi,iOS,JazzCash Checkout,Auto,Monthly,59,39
+Rawalpindi,iOS,JazzCash Checkout,Auto,Quarterly,7,2
+Rawalpindi,iOS,JazzCash Checkout,Auto,Weekly,284,197
+Rawalpindi,iOS,Ufone,Auto,Monthly,6,6
+Rawalpindi,iOS,Ufone,Auto,Weekly,107,66
+Rawalpindi,iOS,Zindigi,Manual,Monthly,1,0
+Rawalpindi,iOS,Zindigi,Manual,Weekly,3,0
+Rawalpindi,iOS,Zong,Auto,Weekly,57,33

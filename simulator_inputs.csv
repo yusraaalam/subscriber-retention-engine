@@ -1,0 +1,5 @@
+package,retention_Auto,retention_Manual,active_Auto,active_Manual,price
+Half Yearly,0.611,0.097,1244,435,2300
+Monthly,0.651,0.114,13572,1607,600
+Quarterly,0.648,0.091,610,115,1400
+Weekly,0.702,0.079,3164,199,200

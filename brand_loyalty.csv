@@ -1,0 +1,9 @@
+package,payment_mode,renewals_compared,same_top_brand
+Half Yearly,Auto,81,0.58
+Half Yearly,Manual,61,0.459
+Monthly,Auto,3407,0.607
+Monthly,Manual,1461,0.595
+Quarterly,Auto,256,0.594
+Quarterly,Manual,49,0.49
+Weekly,Auto,6824,0.635
+Weekly,Manual,1352,0.609

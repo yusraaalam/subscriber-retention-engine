@@ -1,0 +1,15 @@
+campaign,payment_mode,risk_band,recommended_action,subscribers,revenue_at_stake,avg_lapse_risk
+PKR 79,Auto,High,Show value before the Rs.600 charge,1524,120396.0,0.59
+PKR 79,Auto,Medium,Show value before the Rs.600 charge,9703,766537.0,0.394
+PKR 79,Auto,Low,Show value before the Rs.600 charge,459,36261.0,0.218
+PKR 79,Manual,High,Push auto-pay before expiry,1507,119053.0,0.906
+Regular,Auto,High,Activation nudge: top deals near you,437,270400.0,0.597
+Regular,Auto,High,No action,23,32700.0,0.547
+Regular,Auto,High,Win-back reminder 2 days before expiry,73,134800.0,0.574
+Regular,Auto,Medium,Activation nudge: top deals near you,2120,2168800.0,0.376
+Regular,Auto,Medium,No action,525,1102700.0,0.37
+Regular,Auto,Medium,Win-back reminder 2 days before expiry,19,37500.0,0.405
+Regular,Auto,Low,Activation nudge: top deals near you,3576,1498300.0,0.164
+Regular,Auto,Low,No action,126,225600.0,0.27
+Regular,Auto,Low,Win-back reminder 2 days before expiry,5,8800.0,0.176
+Regular,Manual,High,Push auto-pay before expiry,849,1261300.0,0.878

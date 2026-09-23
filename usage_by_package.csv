@@ -1,0 +1,9 @@
+package,payment_mode,subscriptions,used_any,avg_uses,avg_brands,instore_uses,ecom_uses,delivery_orders,median_days_to_first_use
+Half Yearly,Auto,1737,0.472,3.808,1.049,6531,84,268,6.463
+Half Yearly,Manual,598,0.783,7.234,2.1,4213,113,203,0.037
+Monthly,Auto,30598,0.331,1.41,0.525,40868,2270,1215,0.087
+Monthly,Manual,9736,0.707,3.063,1.217,28317,1500,593,0.01
+Quarterly,Auto,1621,0.471,2.865,0.864,4544,100,156,7.051
+Quarterly,Manual,306,0.745,5.876,1.712,1741,57,43,0.029
+Weekly,Auto,130282,0.207,0.525,0.245,66609,1752,596,0.008
+Weekly,Manual,8937,0.748,1.819,0.928,15380,875,112,0.002

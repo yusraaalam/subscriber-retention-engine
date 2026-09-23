@@ -1,0 +1,21 @@
+odds_ratio,ci_low,ci_high,p_value,driver,in_plain_english
+0.074,0.066,0.084,0.0,Bought a promo package (New Year/Eid/Ramadan),13.5x more likely to lapse
+0.266,0.254,0.278,0.0,History: Lapsed before,3.8x more likely to lapse
+0.543,0.481,0.612,0.0,Used an Ecom deal in first 5 days,1.8x more likely to lapse
+0.617,0.57,0.668,0.0,Pays via Zong,1.6x more likely to lapse
+0.772,0.741,0.804,0.0,History: Renewed last time,1.3x more likely to lapse
+0.91,0.864,0.958,0.0,City: Multan,1.1x more likely to lapse
+0.933,0.898,0.97,0.0,City: Karachi,1.1x more likely to lapse
+0.965,0.935,0.995,0.024,City: Other,1.0x more likely to lapse
+0.981,0.931,1.033,0.466,Uses in first 5 days (log),No real effect
+0.999,0.944,1.057,0.973,City: Faisalabad,No real effect
+1.005,0.937,1.078,0.885,City: Islamabad,No real effect
+1.059,0.99,1.132,0.094,City: Rawalpindi,No real effect
+1.083,1.053,1.114,0.0,Device: iOS,1.1x more likely to renew
+1.106,1.032,1.185,0.004,Device: Unknown,1.1x more likely to renew
+1.144,1.072,1.221,0.0,Used the subscription in first 5 days,1.1x more likely to renew
+1.178,1.131,1.227,0.0,Package: Monthly,1.2x more likely to renew
+1.248,1.117,1.394,0.0,Package: Long term,1.2x more likely to renew
+1.472,1.43,1.515,0.0,Pays via JazzCash Checkout,1.5x more likely to renew
+1.761,1.675,1.851,0.0,Pays via Ufone,1.8x more likely to renew
+2.529,2.466,2.593,0.0,Number of past cycles (log),2.5x more likely to renew

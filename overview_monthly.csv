@@ -1,0 +1,77 @@
+month,package,campaign,payment_mode,subscriptions,users,new_users,ontime_renewals,revenue
+2026-01,Half Yearly,Regular,Auto,243,243,243,0,558900.0
+2026-01,Half Yearly,Regular,Manual,88,88,88,0,202400.0
+2026-01,Monthly,New Year,Auto,1464,1464,1430,2,585600.0
+2026-01,Monthly,New Year,Manual,2161,2160,2111,11,864400.0
+2026-01,Monthly,Regular,Auto,951,951,951,0,570600.0
+2026-01,Monthly,Regular,Manual,55,55,55,0,33000.0
+2026-01,Quarterly,Regular,Auto,191,191,191,0,267400.0
+2026-01,Quarterly,Regular,Manual,40,40,39,0,56000.0
+2026-01,Weekly,Regular,Auto,13716,5957,5951,6462,2743200.0
+2026-01,Weekly,Regular,Manual,1109,1066,1053,12,221800.0
+2026-02,Half Yearly,Regular,Auto,250,250,244,1,575000.0
+2026-02,Half Yearly,Regular,Manual,75,75,70,0,172500.0
+2026-02,Monthly,New Year,Auto,799,799,739,2,319600.0
+2026-02,Monthly,New Year,Manual,1109,1109,989,22,443600.0
+2026-02,Monthly,Regular,Auto,1048,1048,252,631,628800.0
+2026-02,Monthly,Regular,Manual,125,125,101,4,75000.0
+2026-02,Quarterly,Regular,Auto,218,218,208,0,305200.0
+2026-02,Quarterly,Regular,Manual,45,45,39,1,63000.0
+2026-02,Weekly,Regular,Auto,15710,7234,3886,7732,3142000.0
+2026-02,Weekly,Regular,Manual,1353,1315,1164,15,270600.0
+2026-03,Half Yearly,Regular,Auto,176,176,163,2,404800.0
+2026-03,Half Yearly,Regular,Manual,81,81,72,0,186300.0
+2026-03,Monthly,Eid,Auto,471,471,368,2,188400.0
+2026-03,Monthly,Eid,Manual,796,796,566,6,318400.0
+2026-03,Monthly,Ramadan,Auto,396,396,265,8,158400.0
+2026-03,Monthly,Ramadan,Manual,722,722,493,17,288800.0
+2026-03,Monthly,Regular,Auto,890,890,61,689,534000.0
+2026-03,Monthly,Regular,Manual,53,53,40,1,31800.0
+2026-03,Quarterly,Regular,Auto,222,222,214,1,310800.0
+2026-03,Quarterly,Regular,Manual,43,43,33,0,60200.0
+2026-03,Weekly,Regular,Auto,15116,6684,2413,9170,3023200.0
+2026-03,Weekly,Regular,Manual,1330,1288,995,19,266000.0
+2026-04,Half Yearly,Regular,Auto,181,181,166,0,416300.0
+2026-04,Half Yearly,Regular,Manual,72,72,66,0,165600.0
+2026-04,Monthly,Eid,Auto,664,664,490,14,265600.0
+2026-04,Monthly,Eid,Manual,831,831,573,24,332400.0
+2026-04,Monthly,Regular,Auto,1487,1486,544,593,892200.0
+2026-04,Monthly,Regular,Manual,303,303,207,13,181800.0
+2026-04,Quarterly,Regular,Auto,183,183,53,104,256200.0
+2026-04,Quarterly,Regular,Manual,33,33,27,1,46200.0
+2026-04,Weekly,Regular,Auto,16571,8538,3853,8410,3314200.0
+2026-04,Weekly,Regular,Manual,981,950,765,12,196200.0
+2026-05,Half Yearly,Regular,Auto,178,178,161,3,409400.0
+2026-05,Half Yearly,Regular,Manual,78,78,63,0,179400.0
+2026-05,Monthly,Regular,Auto,2698,2698,1027,860,1618800.0
+2026-05,Monthly,Regular,Manual,768,768,481,18,460800.0
+2026-05,Quarterly,Regular,Auto,197,197,39,118,275800.0
+2026-05,Quarterly,Regular,Manual,30,30,18,0,42000.0
+2026-05,Weekly,Regular,Auto,18337,8141,2396,11415,3667400.0
+2026-05,Weekly,Regular,Manual,881,840,595,5,176200.0
+2026-06,Half Yearly,Regular,Auto,178,178,168,0,409400.0
+2026-06,Half Yearly,Regular,Manual,72,72,59,0,165600.0
+2026-06,Monthly,Regular,Auto,3276,3276,992,1325,1965600.0
+2026-06,Monthly,Regular,Manual,783,783,472,16,469800.0
+2026-06,Quarterly,Regular,Auto,191,191,28,123,267400.0
+2026-06,Quarterly,Regular,Manual,33,33,25,0,46200.0
+2026-06,Weekly,Regular,Auto,15692,6838,1827,9941,3138400.0
+2026-06,Weekly,Regular,Manual,850,817,570,11,170000.0
+2026-07,Half Yearly,Regular,Auto,268,268,94,130,616400.0
+2026-07,Half Yearly,Regular,Manual,73,73,46,2,167900.0
+2026-07,Monthly,Regular,Auto,2882,2882,464,1592,1729200.0
+2026-07,Monthly,Regular,Manual,422,422,241,12,253200.0
+2026-07,Quarterly,Regular,Auto,216,216,47,108,302400.0
+2026-07,Quarterly,Regular,Manual,46,46,27,2,64400.0
+2026-07,Weekly,Regular,Auto,17260,7780,2715,10062,3452000.0
+2026-07,Weekly,Regular,Manual,1142,1097,731,10,228400.0
+2026-08,Half Yearly,Regular,Auto,263,263,83,121,604900.0
+2026-08,Half Yearly,Regular,Manual,59,59,37,2,135700.0
+2026-08,Monthly,PKR 79,Auto,11686,11686,9158,111,923194.0
+2026-08,Monthly,PKR 79,Manual,1508,1508,1143,15,119132.0
+2026-08,Monthly,Regular,Auto,1886,1886,159,1401,1131600.0
+2026-08,Monthly,Regular,Manual,100,100,57,14,60000.0
+2026-08,Quarterly,Regular,Auto,203,203,41,115,284200.0
+2026-08,Quarterly,Regular,Manual,36,36,20,2,50400.0
+2026-08,Weekly,Regular,Auto,17880,7769,2174,10886,3576000.0
+2026-08,Weekly,Regular,Manual,1291,646,380,561,258200.0
