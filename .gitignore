@@ -1,7 +1,0 @@
-.streamlit/secrets.toml
-*.xlsx
-golootlo_subscription_master.csv
-renewal_risk_list.csv
-Subscription_data*.csv
-*Transaction_Data*.csv
-__pycache__/
