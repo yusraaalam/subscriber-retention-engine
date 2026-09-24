@@ -1,6 +1,6 @@
 # Subscriber Retention Engine: Golootlo
-# One-file Streamlit dashboard. Data files sit next to this file
-# (or in a dashboard_data folder). Target Lists reads from Supabase.
+# One-file Streamlit dashboard. All summary data lives in one file,
+# dashboard_data.xlsx, next to this file. Target Lists reads Supabase.
 import io
 import json
 from pathlib import Path
@@ -77,13 +77,30 @@ button[data-baseweb="tab"] p { font-size: 0.95rem; font-weight: 600; }
 </style>""", unsafe_allow_html=True)
 
 
+BOOK_FILE = BASE / 'dashboard_data.xlsx'
+
+
 @st.cache_data
+def book():
+    # one sheet per table; returns None if the Excel file is not there
+    if BOOK_FILE.exists():
+        return pd.read_excel(BOOK_FILE, sheet_name=None)
+    return None
+
+
 def csv(name):
+    b = book()
+    stem = name.rsplit('.', 1)[0][:31]
+    if b is not None and stem in b:
+        return b[stem].copy()
     return pd.read_csv(DATA / name)
 
 
-@st.cache_data
 def js(name):
+    b = book()
+    stem = name.rsplit('.', 1)[0][:31]
+    if b is not None and stem in b:
+        return json.loads(b[stem]['json'].iloc[0])
     with open(DATA / name) as f:
         return json.load(f)
 
