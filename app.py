@@ -1,6 +1,7 @@
 # Subscriber Retention Engine: Golootlo
 # One-file Streamlit dashboard. Data files sit next to this file
-# (or in a dashboard_data folder). The target list reads from Supabase.
+# (or in a dashboard_data folder). Target Lists reads from Supabase.
+import io
 import json
 from pathlib import Path
 
@@ -12,7 +13,7 @@ st.set_page_config(page_title='Subscriber Retention Engine',
                    page_icon='📈', layout='wide')
 
 # =============================================================
-# SETUP: paths, colours, helpers
+# SETUP
 # =============================================================
 BASE = Path(__file__).parent
 DATA = BASE / 'dashboard_data' if (BASE / 'dashboard_data').exists() \
@@ -20,8 +21,13 @@ DATA = BASE / 'dashboard_data' if (BASE / 'dashboard_data').exists() \
 
 BRAND = '#0064DC'
 TEXT = '#FAFAFA'
+MUTED = '#9AA0A6'
 GRID = '#262A33'
 BG = '#0E1117'
+GREY = '#5f6b7a'
+RED = '#d95926'
+AMBER = '#c98500'
+GREEN = '#199e70'
 PKG_ORDER = ['Weekly', 'Monthly', 'Quarterly', 'Half Yearly']
 PKG_COLORS = {'Weekly': '#3987e5', 'Monthly': '#d95926',
               'Quarterly': '#199e70', 'Half Yearly': '#c98500'}
@@ -36,7 +42,11 @@ st.markdown("""
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 html, body, [class*="css"], .stMarkdown, .stMetric, button, input {
   font-family: 'Inter', sans-serif !important; }
-.block-container { padding-top: 2rem; max-width: 1300px; }
+.block-container { padding-top: 1.5rem; max-width: 1300px; }
+#MainMenu, footer, [data-testid="stToolbar"],
+[data-testid="stDecoration"], [data-testid="stStatusWidget"] {
+  display: none !important; visibility: hidden !important; }
+header[data-testid="stHeader"] { background: transparent; }
 div[data-testid="stMetric"] { background: #161A22;
   border: 1px solid #262A33; border-radius: 12px;
   padding: 14px 16px; border-top: 3px solid #0064DC; }
@@ -47,6 +57,22 @@ div[data-testid="stMetricLabel"] p { color: #9AA0A6;
   color: #E5E7EB; font-size: 0.92rem; line-height: 1.5; }
 .insight b { color: #FFFFFF; }
 .caveat { color: #9AA0A6; font-size: 0.8rem; }
+.card { background: #161A22; border: 1px solid #262A33;
+  border-radius: 12px; padding: 16px 18px; height: 100%; }
+.card h4 { margin: 0 0 4px 0; font-size: 0.95rem; color: #FAFAFA; }
+.card .big { font-size: 1.9rem; font-weight: 700; color: #FAFAFA;
+  line-height: 1.2; }
+.card .sub { color: #9AA0A6; font-size: 0.85rem; line-height: 1.5; }
+.bar { height: 10px; border-radius: 5px; background: #262A33;
+  overflow: hidden; display: flex; margin: 10px 0 6px 0; }
+.bar span { display: block; height: 100%; }
+.reason { background: #161A22; border: 1px solid #262A33;
+  border-radius: 10px; padding: 10px 14px; margin-bottom: 8px;
+  display: flex; justify-content: space-between; gap: 12px;
+  align-items: center; }
+.reason .x { font-weight: 700; font-size: 1.05rem; white-space: nowrap; }
+.pill { display: inline-block; padding: 2px 10px; border-radius: 99px;
+  font-size: 0.75rem; font-weight: 600; }
 button[data-baseweb="tab"] p { font-size: 0.95rem; font-weight: 600; }
 </style>""", unsafe_allow_html=True)
 
@@ -70,20 +96,24 @@ def rs(x):
     return f'Rs {x:,.0f}'
 
 
+def html(s):
+    st.markdown(s, unsafe_allow_html=True)
+
+
 def insight(observation, so_what, action=None):
-    html = (f"<div class='insight'><b>What we see:</b> {observation}"
-            f"<br><b>So what:</b> {so_what}")
+    s = (f"<div class='insight'><b>What we see:</b> {observation}"
+         f"<br><b>So what:</b> {so_what}")
     if action:
-        html += f"<br><b>Action:</b> {action}"
-    st.markdown(html + "</div>", unsafe_allow_html=True)
+        s += f"<br><b>Action:</b> {action}"
+    html(s + "</div>")
 
 
 def chart_title(text, sub=None):
-    html = (f"<div style='font-weight:600;font-size:0.95rem;"
-            f"margin-top:8px'>{text}</div>")
+    s = (f"<div style='font-weight:600;font-size:0.95rem;"
+         f"margin-top:8px'>{text}</div>")
     if sub:
-        html += f"<div class='caveat'>{sub}</div>"
-    st.markdown(html, unsafe_allow_html=True)
+        s += f"<div class='caveat'>{sub}</div>"
+    html(s)
 
 
 def style(fig, height=360, legend=True):
@@ -105,15 +135,16 @@ def style(fig, height=360, legend=True):
 
 def pct_axis(fig, axis='y'):
     if axis == 'y':
-        fig.update_yaxes(tickformat='.0%', range=[0, 1])
+        fig.update_yaxes(tickformat='.0%', range=[0, 1.05])
     else:
-        fig.update_xaxes(tickformat='.0%', range=[0, 1], showgrid=True,
-                         gridcolor=GRID)
+        fig.update_xaxes(tickformat='.0%', range=[0, 1.05],
+                         showgrid=True, gridcolor=GRID)
     return fig
 
 
 def show(fig):
-    st.plotly_chart(fig, width='stretch')
+    st.plotly_chart(fig, width='stretch',
+                    config={'displayModeBar': False})
 
 
 def rate(df, by):
@@ -122,20 +153,33 @@ def rate(df, by):
     return g.reset_index()
 
 
-def mode_bars(df, x, y, order, pct=True, text=True, hover=''):
-    """Grouped Auto vs Manual bars."""
+def mode_bars(df, x, y, order, hover=''):
     fig = go.Figure()
     for md in ['Auto', 'Manual']:
         d = df[df['payment_mode'] == md].set_index(x).reindex(order)
         fig.add_bar(
             x=order, y=d[y], name=md,
             marker=dict(color=MODE_COLORS[md], cornerradius=4),
-            text=d[y].map('{:.0%}'.format) if text else None,
+            text=d[y].map(lambda v: '' if pd.isna(v) else f'{v:.0%}'),
             textposition='outside',
             hovertemplate='%{x} · ' + md + ': %{y:.0%}' + hover
                           + '<extra></extra>')
     fig.update_layout(barmode='group')
     return fig
+
+
+def payments(r, n):
+    """Expected number of payments in n billing cycles when each cycle
+    renews with probability r (the first payment counts)."""
+    return sum(r ** k for k in range(int(n)))
+
+
+CYCLES_3M = {'Weekly': 13, 'Monthly': 3, 'Quarterly': 1,
+             'Half Yearly': 1}
+
+
+def value_3m(pkg, r):
+    return PRICE[pkg] * payments(r, CYCLES_3M[pkg])
 
 
 # =============================================================
@@ -151,7 +195,7 @@ st.caption(f"Golootlo paid subscriptions, Jan 1 to {END:%b %d, %Y}. "
            "Renewal = a new subscription within 7 days of expiry.")
 
 tabs = st.tabs(['Overview', 'Who Subscribes', 'What Subscribers Do',
-                'Promotions', 'Renewal Risk', 'Auto-Pay Simulator',
+                'Promotions', 'Renewal Risk', 'Revenue Simulator',
                 'Target Lists'])
 
 # =============================================================
@@ -213,7 +257,7 @@ with tabs[0]:
         fig.add_bar(
             y=share['package'], x=share['subscriptions'],
             name='Share of subscriptions', orientation='h',
-            marker=dict(color='#5f6b7a', cornerradius=4),
+            marker=dict(color=GREY, cornerradius=4),
             hovertemplate='%{y}: %{x:.0%} of subscriptions'
                           '<extra></extra>')
         fig.add_bar(
@@ -237,7 +281,7 @@ with tabs[0]:
     fig = go.Figure()
     for col, name, color in [
             ('returning', 'Returning subscribers', '#3987e5'),
-            ('new', 'First-time subscribers', '#d95926')]:
+            ('new', 'First-time subscribers', RED)]:
         fig.add_scatter(
             x=x, y=nm[col], name=name, mode='lines+markers',
             line=dict(color=color, width=2),
@@ -249,17 +293,20 @@ with tabs[0]:
 
     tot = m.groupby('package')[['subscriptions', 'revenue']].sum()
     tot = tot / tot.sum()
+    cv = js('cohort_value.json')
     insight(
         f"Weekly is {tot.loc['Weekly', 'subscriptions']:.0%} of all "
         f"subscriptions and {tot.loc['Weekly', 'revenue']:.0%} of "
-        f"revenue. Monthly brings {tot.loc['Monthly', 'revenue']:.0%} "
-        f"of revenue from {tot.loc['Monthly', 'subscriptions']:.0%} "
-        "of volume.",
-        "Revenue depends on Weekly auto-debits repeating every 7 days. "
-        "Most of those cycles go unused (see What Subscribers Do), so "
-        "this base is exposed the day users notice the charge.",
-        "Move engaged Weekly users to Monthly or Quarterly, and "
-        "activate the passive ones.")
+        "revenue. While a user stays, Weekly earns more per month "
+        "(Rs 866 vs Rs 600 on Monthly).",
+        "But Weekly users leave faster. Among auto users who started "
+        f"in Jan to Mar, {cv['Weekly']['alive90']:.0%} of Weekly users "
+        f"were still subscribed after 90 days vs "
+        f"{cv['Monthly']['alive90']:.0%} on Monthly. Over 5 months a "
+        f"Monthly auto user brought Rs {cv['Monthly']['rev150']:,.0f} "
+        f"vs Rs {cv['Weekly']['rev150']:,.0f} for Weekly.",
+        "Keep Weekly auto users where they are. Target Weekly MANUAL "
+        "payers, who barely renew, with a Monthly auto-pay offer.")
     last, prev = months[-1], months[-2]
     a_, p_ = m[m['month'] == last], m[m['month'] == prev]
     insight(
@@ -276,76 +323,89 @@ with tabs[0]:
 # =============================================================
 with tabs[1]:
     seg0, ret0 = csv('segments.csv'), csv('segment_retention.csv')
-    f1, f2 = st.columns([3, 1])
+    city_order = (seg0[seg0['city15'] != 'Other']
+                  .groupby('city15')['subscriptions'].sum()
+                  .sort_values(ascending=False).index.tolist())
+    f1, f2, f3, f4 = st.columns([2, 1, 1, 1])
     pk = f1.multiselect('Package', PKG_ORDER, default=PKG_ORDER,
                         key='w_p')
     pm = f2.selectbox('Payment', ['All', 'Auto', 'Manual'], key='w_pm')
-    seg = seg0[seg0['package'].isin(pk)]
-    ret = ret0[ret0['package'].isin(pk)]
-    if pm != 'All':
-        seg = seg[seg['payment_mode'] == pm]
-        ret = ret[ret['payment_mode'] == pm]
+    city = f3.selectbox('City', ['All'] + city_order + ['Other'],
+                        key='w_c')
+    dev = f4.selectbox('Device', ['All', 'Android', 'iOS', 'Unknown'],
+                       key='w_d')
 
-    city_tot = seg[seg['city_grp'] != 'Other'].groupby(
-        'city_grp')['subscriptions'].sum()
-    dev = seg.groupby('device')['subscriptions'].sum()
+    def filt(df, use_city=True, use_dev=True):
+        df = df[df['package'].isin(pk)]
+        if pm != 'All':
+            df = df[df['payment_mode'] == pm]
+        if use_city and city != 'All':
+            df = df[df['city15'] == city]
+        if use_dev and dev != 'All':
+            df = df[df['device'] == dev]
+        return df
+
+    seg, ret = filt(seg0), filt(ret0)
+    sel = ' · '.join(x for x in [city if city != 'All' else '',
+                                 dev if dev != 'All' else ''] if x)
+    if sel:
+        st.caption(f'Showing: {sel}')
+
     mode = seg.groupby('payment_mode')['subscriptions'].sum()
+    rr = ret['retained'].sum() / max(ret['labelled'].sum(), 1)
+    rr_all = ret0['retained'].sum() / ret0['labelled'].sum()
     pay = rate(ret, 'Transaction_Type')
-    pay = pay[pay['labelled'] >= 300].sort_values('rate')
-    ios, andr = dev.get('iOS', 0), dev.get('Android', 0)
+    pay = pay[pay['labelled'] >= 100].sort_values('rate')
     c = st.columns(4)
-    c[0].metric('Biggest city', city_tot.idxmax(),
-                f"{city_tot.max() / seg['subscriptions'].sum():.0%} of "
-                "subscriptions", delta_color='off', delta_arrow='off')
+    c[0].metric('Subscriptions', f"{seg['subscriptions'].sum():,}")
     c[1].metric('Paid by auto-debit',
-                f"{mode.get('Auto', 0) / mode.sum():.0%}")
-    c[2].metric('iOS share (known devices)',
-                f"{ios / max(ios + andr, 1):.0%}")
-    c[3].metric('Best-renewing method',
-                pay.iloc[-1]['Transaction_Type'],
-                f"{pay.iloc[-1]['rate']:.0%} renew",
+                f"{mode.get('Auto', 0) / max(mode.sum(), 1):.0%}")
+    c[2].metric('Renewal rate', f"{rr:.0%}", f"all users: {rr_all:.0%}",
                 delta_color='off', delta_arrow='off')
+    if len(pay):
+        c[3].metric('Best-renewing method',
+                    pay.iloc[-1]['Transaction_Type'],
+                    f"{pay.iloc[-1]['rate']:.0%} renew",
+                    delta_color='off', delta_arrow='off')
 
-    cities = (seg.groupby('city_grp')['subscriptions'].sum()
-              .sort_values(ascending=False).index.tolist())
     left, right = st.columns(2)
+    cs = filt(seg0, use_city=False)
+    cr = filt(ret0, use_city=False)
+    cities = city_order + ['Other']
+    hl = [BRAND if (city in ('All', c_)) else GREY for c_ in cities]
     with left:
         chart_title('Subscriptions by city',
-                    '"Other" = all cities outside the top 6')
-        cm = seg.groupby(['city_grp', 'payment_mode'])[
-            'subscriptions'].sum().reset_index()
-        fig = go.Figure()
-        for md in ['Auto', 'Manual']:
-            d = cm[cm['payment_mode'] == md].set_index('city_grp')
-            d = d.reindex(cities).fillna(0)
-            fig.add_bar(
-                y=cities, x=d['subscriptions'], name=md,
-                orientation='h',
-                marker=dict(color=MODE_COLORS[md], cornerradius=4,
-                            line=dict(width=2, color=BG)),
-                hovertemplate='%{y} · ' + md + ': %{x:,}<extra></extra>')
-        fig.update_layout(barmode='stack',
-                          yaxis=dict(autorange='reversed'))
-        show(style(fig, height=340))
-    with right:
-        chart_title('Renewal rate by city, auto-debit payers only',
-                    'Auto only, so payment mix does not distort it')
-        ca = rate(ret[ret['payment_mode'] == 'Auto'], 'city_grp')
-        ca = ca.set_index('city_grp').reindex(cities).reset_index()
+                    'Top 15 cities. Your selected city is highlighted.')
+        tot_c = cs.groupby('city15')['subscriptions'].sum()
+        tot_c = tot_c.reindex(cities).fillna(0)
         fig = go.Figure()
         fig.add_bar(
-            y=ca['city_grp'], x=ca['rate'], orientation='h',
-            marker=dict(color=BRAND, cornerradius=4),
-            text=ca['rate'].map('{:.0%}'.format), textposition='outside',
-            customdata=ca['labelled'],
+            y=cities, x=tot_c.values, orientation='h',
+            marker=dict(color=hl, cornerradius=4),
+            hovertemplate='%{y}: %{x:,} subscriptions<extra></extra>')
+        fig.update_layout(yaxis=dict(autorange='reversed'))
+        show(style(fig, height=480, legend=False))
+    with right:
+        chart_title('Renewal rate by city',
+                    'Auto-pay users only, so payment mix does not '
+                    'distort the comparison')
+        ca = rate(cr[cr['payment_mode'] == 'Auto'], 'city15')
+        ca = ca.set_index('city15').reindex(cities).reset_index()
+        fig = go.Figure()
+        fig.add_bar(
+            y=ca['city15'], x=ca['rate'], orientation='h',
+            marker=dict(color=hl, cornerradius=4),
+            text=ca['rate'].map(
+                lambda v: '' if pd.isna(v) else f'{v:.0%}'),
+            textposition='outside', customdata=ca['labelled'],
             hovertemplate='%{y}: %{x:.1%} renew<br>%{customdata:,} '
                           'subscriptions measured<extra></extra>')
         fig.update_layout(yaxis=dict(autorange='reversed'))
-        show(pct_axis(style(fig, height=340, legend=False), 'x'))
+        show(pct_axis(style(fig, height=480, legend=False), 'x'))
 
     pv = seg.groupby(['Transaction_Type', 'payment_mode'])[
         'subscriptions'].sum().reset_index()
-    pv = pv[pv['subscriptions'] >= 100].sort_values('subscriptions')
+    pv = pv[pv['subscriptions'] >= 30].sort_values('subscriptions')
     left, right = st.columns(2)
     with left:
         chart_title('Subscriptions by payment method')
@@ -364,7 +424,7 @@ with tabs[1]:
         show(style(fig, height=380))
     with right:
         chart_title('Renewal rate by payment method',
-                    'Methods with 300+ measured subscriptions')
+                    'Methods with 100+ measured subscriptions')
         modes = pv.drop_duplicates('Transaction_Type').set_index(
             'Transaction_Type')['payment_mode']
         pay['mode'] = pay['Transaction_Type'].map(modes)
@@ -383,11 +443,27 @@ with tabs[1]:
             categoryarray=pay['Transaction_Type'].tolist()))
         show(pct_axis(style(fig, height=380), 'x'))
 
-    chart_title('Renewal rate by device and payment type')
-    dr = rate(ret, ['device', 'payment_mode'])
-    show(pct_axis(style(mode_bars(dr, 'device', 'rate',
-                                  ['Android', 'iOS', 'Unknown'],
-                                  hover=' renew'), height=300)))
+    left, right = st.columns(2)
+    ds = filt(seg0, use_dev=False)
+    dr_ = filt(ret0, use_dev=False)
+    devs = ['Android', 'iOS', 'Unknown']
+    with left:
+        chart_title('Subscriptions by device')
+        dv = ds.groupby('device')['subscriptions'].sum().reindex(devs)
+        fig = go.Figure()
+        fig.add_bar(
+            x=devs, y=dv.values,
+            marker=dict(color=[BRAND if dev in ('All', d_) else GREY
+                               for d_ in devs], cornerradius=4),
+            text=[f'{v / dv.sum():.0%}' for v in dv.values],
+            textposition='outside',
+            hovertemplate='%{x}: %{y:,} subscriptions<extra></extra>')
+        show(style(fig, height=300, legend=False))
+    with right:
+        chart_title('Renewal rate by device and payment type')
+        drr = rate(dr_, ['device', 'payment_mode'])
+        show(pct_axis(style(mode_bars(drr, 'device', 'rate', devs,
+                                      hover=' renew'), height=300)))
 
     a = rate(ret0, 'Transaction_Type').set_index('Transaction_Type')
     a = a['rate']
@@ -399,24 +475,20 @@ with tabs[1]:
         f"{a['Bill Payment']:.0%}.",
         "Device barely matters once payment type is known. The lever is "
         "the payment rail, not the phone.",
-        "Default checkout to a wallet or carrier auto-debit. Treat card "
-        "and bill-payment users as one-time buyers unless they switch.")
-    big = ['Lahore', 'Karachi', 'Multan', 'Faisalabad', 'Rawalpindi',
-           'Islamabad']
-    acr = rate(ret0[ret0['payment_mode'] == 'Auto'], 'city_grp')
-    acr = acr.set_index('city_grp').reindex(big)
+        "Default checkout to a wallet or carrier auto-debit.")
+    big = city_order[:6]
+    acr = rate(ret0[ret0['payment_mode'] == 'Auto'], 'city15')
+    acr = acr.set_index('city15').reindex(big)
     ac = acr['rate'].sort_values()
     low = ', '.join(f"{c_} {v:.0%}" for c_, v in ac.head(3).items())
     high = ', '.join(f"{c_} {v:.0%}" for c_, v in ac.tail(2).items())
-    gap = (ac.max() - ac['Karachi']) * acr.loc['Karachi', 'labelled']
     insight(
-        f"Among auto payers, the weakest renewers are {low}. "
-        f"The strongest are {high}.",
-        "Karachi is the second-biggest market and sits in the weak "
-        f"group. Matching the best city's rate would have kept about "
-        f"{gap:,.0f} more Karachi renewals over Jan to Aug.",
-        "Check Karachi deal coverage and wallet-balance failures before "
-        "spending more on Karachi acquisition.")
+        f"Among auto payers in the six biggest cities, the weakest "
+        f"renewers are {low}. The strongest are {high}.",
+        "A few points of renewal in a big city is thousands of "
+        "subscriptions a year.",
+        "Check deal coverage and wallet-balance failures in the weak "
+        "cities before spending more on acquisition there.")
 
 # =============================================================
 # TAB 3: WHAT SUBSCRIBERS DO
@@ -457,11 +529,10 @@ with tabs[2]:
                                     'delivery_orders']].sum()
         v = v.reindex(order)
         v = v.div(v.sum(axis=1), axis=0)
-        parts = [('instore_uses', 'Instore', '#3987e5'),
-                 ('ecom_uses', 'Ecom', '#d95926'),
-                 ('delivery_orders', 'Delivery', '#199e70')]
         fig = go.Figure()
-        for col, name, color in parts:
+        for col, name, color in [('instore_uses', 'Instore', '#3987e5'),
+                                 ('ecom_uses', 'Ecom', RED),
+                                 ('delivery_orders', 'Delivery', GREEN)]:
             fig.add_bar(
                 y=order, x=v[col], name=name, orientation='h',
                 marker=dict(color=color, line=dict(width=2, color=BG)),
@@ -512,10 +583,10 @@ with tabs[2]:
         f"are used at all. Weekly manual payers use "
         f"{wm['used_any']:.0%} of theirs, usually within minutes of "
         "paying.",
-        "Manual payers subscribe at the counter to unlock one deal. "
-        "Auto payers keep paying whether or not they use it. That is "
-        "inertia, and it turns into cancellations and complaints once "
-        "users notice the charge.",
+        "Manual payers subscribe at the counter to unlock a deal. Auto "
+        "payers keep paying whether or not they use it. That is "
+        "inertia, and it turns into cancellations once users notice "
+        "the charge.",
         "Send every new auto subscriber a 'your first deal nearby' push "
         "within 48 hours, and flag 3 unused weeks in a row for a "
         "re-engagement offer.")
@@ -526,126 +597,157 @@ with tabs[2]:
         "are a single point of failure for retention.",
         "Protect the KFC deal, and push a second brand in the first "
         "week so users build more than one habit.")
-    insight(
-        f"{same:.0%} of renewers keep the same favourite brand from one "
-        "subscription to the next.",
-        "With 30,000+ brands available, this is preference, not lack "
-        "of choice.",
-        "Personalise renewal reminders with the user's own top brand.")
 
 # =============================================================
 # TAB 4: PROMOTIONS
 # =============================================================
 with tabs[3]:
-    camp = csv('campaigns.csv')
-    nxt = csv('campaign_next_package.csv').set_index('campaign')
+    camp = csv('campaigns.csv').set_index('campaign')
+    r100 = csv('campaign_return_100.csv').set_index('campaign')
     promos = ['New Year', 'Ramadan', 'Eid', 'PKR 79']
-    cp = camp.set_index('campaign').reindex(promos + ['Regular'])
-    done = cp.loc[['New Year', 'Ramadan', 'Eid']]
-    reg = cp.loc['Regular']
-
-    pr = cp.loc[promos]
+    done = ['New Year', 'Ramadan', 'Eid']
+    pr, reg = camp.loc[promos], camp.loc['Regular']
     new_share = ((pr['new_to_subscription'] * pr['subscriptions']).sum()
                  / pr['subscriptions'].sum())
-    back30 = ((done['returned_30d'] * done['labelled_30d']).sum()
-              / done['labelled_30d'].sum())
+    dn = camp.loc[done]
+    back30 = ((dn['returned_30d'] * dn['labelled_30d']).sum()
+              / dn['labelled_30d'].sum())
     c = st.columns(4)
-    c[0].metric('Promo subscriptions', f"{pr['subscriptions'].sum():,.0f}")
-    c[1].metric('First-time subscribers in promos', f"{new_share:.0%}")
+    c[0].metric('Promo subscriptions',
+                f"{pr['subscriptions'].sum():,.0f}")
+    c[1].metric('New to Golootlo subscriptions', f"{new_share:.0%}")
     c[2].metric('Discount given', rs(pr['discount_given'].sum()))
-    c[3].metric('Back within 30 days (past promos)', f"{back30:.0%}",
-                f"regular: {reg['returned_30d']:.0%}",
+    c[3].metric('Came back within 30 days', f"{back30:.0%}",
+                f"regular subscribers: {reg['returned_30d']:.0%}",
                 delta_color='off', delta_arrow='off')
+
+    st.markdown('#### Out of every 100 promo buyers…')
+    st.caption('Did they buy another subscription within 30 days of '
+               'the promo ending, and which one?')
+    cols = st.columns(5)
+    for col, name in zip(cols, done + ['Regular', 'PKR 79']):
+        with col:
+            if name == 'PKR 79':
+                html("<div class='card'><h4>PKR 79</h4>"
+                     "<div class='big'>Sept</div><div class='sub'>"
+                     "Their first renewal is due in September. Measured "
+                     "once September data is added.</div></div>")
+                continue
+            row = r100.loc[name]
+            back = 100 - row['Did not return']
+            mo, wk = row.get('Monthly', 0), row.get('Weekly', 0)
+            oth = back - mo - wk
+            label = 'Regular (benchmark)' if name == 'Regular' else name
+            html(f"<div class='card'><h4>{label}</h4>"
+                 f"<div class='big'>{back:.0f}"
+                 f"<span style='font-size:1rem;color:{MUTED}'>"
+                 f" / 100 came back</span></div>"
+                 f"<div class='bar'>"
+                 f"<span style='width:{mo}%;background:{RED}'></span>"
+                 f"<span style='width:{wk}%;background:#3987e5'></span>"
+                 f"<span style='width:{oth}%;background:{GREEN}'></span>"
+                 f"</div><div class='sub'>"
+                 f"<span style='color:{RED}'>■</span> {mo:.0f} on Monthly"
+                 f"<br><span style='color:#3987e5'>■</span> {wk:.0f} on "
+                 f"Weekly<br><span style='color:{GREEN}'>■</span> "
+                 f"{oth:.0f} other<br>⬜ {100 - back:.0f} did not return"
+                 "</div></div>")
 
     left, right = st.columns(2)
     with left:
-        chart_title('Did promo subscribers come back?',
-                    'Share who subscribed again. PKR 79 renewals start '
-                    'in September, so they are not measured yet.')
-        names = ['New Year', 'Ramadan', 'Eid', 'Regular']
-        d = cp.loc[names]
+        chart_title('Transactions per subscriber',
+                    'Instore scans + ecom redemptions + delivery orders '
+                    'during the subscription. PKR 79 is only part-way '
+                    'through its month (data ends Aug 31).')
+        names = promos + ['Regular']
+        d = camp.loc[names]
         fig = go.Figure()
-        for col, name, color in [
-                ('retained_7d', 'Within 7 days', '#3987e5'),
-                ('returned_30d', 'Within 30 days', '#d95926')]:
+        for col, name, color in [('instore', 'Instore', '#3987e5'),
+                                 ('ecom', 'Ecom', RED),
+                                 ('delivery', 'Delivery', GREEN)]:
             fig.add_bar(
-                x=names, y=d[col], name=name,
-                marker=dict(color=color, cornerradius=4),
-                text=d[col].map('{:.0%}'.format), textposition='outside',
-                hovertemplate='%{x}: %{y:.0%} ' + name.lower()
-                              + '<extra></extra>')
-        fig.update_layout(barmode='group')
-        show(pct_axis(style(fig, height=360)))
+                x=names, y=d[col] / d['subscriptions'], name=name,
+                marker=dict(color=color, line=dict(width=2, color=BG)),
+                hovertemplate='%{x} · ' + name + ': %{y:.2f} per '
+                              'subscriber<extra></extra>')
+        per = (d['transactions'] + d['delivery']) / d['subscriptions']
+        fig.add_scatter(x=names, y=per, mode='text',
+                        text=[f'{v:.1f}' for v in per],
+                        textposition='top center', showlegend=False,
+                        hoverinfo='skip')
+        fig.update_layout(barmode='stack')
+        show(style(fig, height=340))
     with right:
-        chart_title('What they bought next',
-                    'Next subscription after the promo package')
-        cols = ['Weekly', 'Monthly', 'Quarterly', 'Half Yearly', 'None']
-        colors = {**PKG_COLORS, 'None': '#5f6b7a'}
-        d = nxt.reindex(names)[cols]
+        chart_title('Share of subscribers who used it at least once')
         fig = go.Figure()
-        for col in cols:
-            label = 'Did not return' if col == 'None' else col
-            fig.add_bar(
-                y=names, x=d[col], name=label, orientation='h',
-                marker=dict(color=colors[col],
-                            line=dict(width=2, color=BG)),
-                hovertemplate='%{y} → ' + label + ': %{x:.0%}'
-                              '<extra></extra>')
-        fig.update_layout(barmode='stack',
-                          yaxis=dict(autorange='reversed'))
-        show(pct_axis(style(fig, height=360), 'x'))
+        fig.add_bar(
+            x=names, y=d['used_any'],
+            marker=dict(color=[BRAND] * 4 + [GREY], cornerradius=4),
+            text=d['used_any'].map('{:.0%}'.format),
+            textposition='outside',
+            hovertemplate='%{x}: %{y:.0%} used it<extra></extra>')
+        show(pct_axis(style(fig, height=340, legend=False)))
 
     chart_title('Campaign economics')
-    t = cp.loc[promos].reset_index()
+    t = camp.loc[promos].reset_index()
     t['Ran'] = (pd.to_datetime(t['first_start']).dt.strftime('%b %d')
                 + ' to '
                 + pd.to_datetime(t['last_start']).dt.strftime('%b %d'))
-    t['Back in 30 days'] = t['returned_30d']
-    t['Discount per returning user'] = t['discount_given'] / (
-        t['subscriptions'] * t['returned_30d'])
+    t['Discount per subscription'] = t['original_price'] - t['promo_price']
+    t['Transactions'] = t['transactions'] + t['delivery']
+    t['Per subscriber'] = t['Transactions'] / t['subscriptions']
     money = st.column_config.NumberColumn(format='Rs %,.0f')
     pct = st.column_config.NumberColumn(format='percent')
+    num = st.column_config.NumberColumn(format='%,d')
     st.dataframe(
-        t[['campaign', 'Ran', 'subscriptions', 'new_to_subscription',
-           'revenue', 'discount_given', 'Back in 30 days',
-           'Discount per returning user']].rename(columns={
+        t[['campaign', 'Ran', 'subscriptions', 'original_price',
+           'promo_price', 'Discount per subscription', 'discount_given',
+           'new_to_subscription', 'Transactions', 'Per subscriber',
+           'returned_30d']].rename(columns={
                'campaign': 'Campaign', 'subscriptions': 'Subscriptions',
-               'new_to_subscription': 'First-time subscribers',
-               'revenue': 'Revenue', 'discount_given': 'Discount given'}),
+               'original_price': 'Original price',
+               'promo_price': 'Promo price',
+               'discount_given': 'Total discount',
+               'new_to_subscription': 'New subscribers',
+               'returned_30d': 'Back in 30 days'}),
         hide_index=True, width='stretch',
-        column_config={'Revenue': money, 'Discount given': money,
-                       'Discount per returning user': money,
-                       'First-time subscribers': pct,
-                       'Back in 30 days': pct,
-                       'Subscriptions': st.column_config.NumberColumn(
-                           format='%,d')})
-    st.markdown("<span class='caveat'>PKR 79 return rates appear once "
+        column_config={
+            'Original price': money, 'Promo price': money,
+            'Discount per subscription': money, 'Total discount': money,
+            'New subscribers': pct, 'Back in 30 days': pct,
+            'Subscriptions': num, 'Transactions': num,
+            'Per subscriber': st.column_config.NumberColumn(
+                format='%.1f')})
+    st.markdown("<span class='caveat'>Original price = Monthly list "
+                "price (Rs 600). PKR 79 return rate appears once "
                 "September data is added.</span>",
                 unsafe_allow_html=True)
 
     insight(
-        f"Promo packages pull in new people: "
-        f"{cp.loc['New Year', 'new_to_subscription']:.0%} of New Year "
-        f"buyers and {cp.loc['PKR 79', 'new_to_subscription']:.0%} of "
-        "PKR 79 buyers had never subscribed before. But only "
-        f"{done['returned_30d'].min():.0%} to "
-        f"{done['returned_30d'].max():.0%} came back within 30 days, "
-        f"vs {reg['returned_30d']:.0%} for regular subscribers.",
-        "Promos work as acquisition, not retention. Most promo buyers "
-        "treat them as a one-off deal. The ones who return mostly move "
-        "to Monthly, not Weekly.",
-        "Judge promos on cost per returning subscriber, not sign-ups. "
-        "Build a day-25 conversion push into every promo that offers "
-        "Monthly auto-pay.")
+        f"Promo buyers are mostly new: {new_share:.0%} had never "
+        "subscribed before. They also use it heavily, about "
+        f"{camp.loc['New Year', 'transactions_per_sub']:.1f} "
+        "transactions each vs "
+        f"{reg['transactions_per_sub']:.1f} for a regular "
+        "subscription. But only "
+        f"{100 - r100.loc[done, 'Did not return'].max():.0f} to "
+        f"{100 - r100.loc[done, 'Did not return'].min():.0f} out of 100 "
+        "come back within 30 days.",
+        "Promos work as acquisition and engagement, not retention. The "
+        "few who come back mostly choose Monthly.",
+        "Judge promos on returning subscribers, not sign-ups. Build a "
+        "day-25 push into every promo offering Monthly auto-pay.")
     insight(
-        f"PKR 79 gave away {rs(cp.loc['PKR 79', 'discount_given'])} in "
-        f"discount for {cp.loc['PKR 79', 'subscriptions']:,.0f} "
-        "subscriptions.",
-        "If PKR 79 buyers return like earlier promos (17 to 26%), each "
-        "returning subscriber will have cost roughly Rs 2,000 to Rs "
-        "3,000 in discount.",
-        "Use September data to confirm the PKR 79 return rate before "
-        "repeating a price this low.")
+        f"PKR 79 gave "
+        f"Rs {camp.loc['PKR 79', 'original_price'] - 79:,.0f} off "
+        f"each of {camp.loc['PKR 79', 'subscriptions']:,.0f} "
+        f"subscriptions: {rs(camp.loc['PKR 79', 'discount_given'])} in "
+        "total.",
+        "If PKR 79 buyers return like earlier promos (17 to 26 in 100), "
+        "each returning subscriber will have cost roughly Rs 2,000 to "
+        "Rs 3,000 in discount.",
+        "Use September data to confirm the return rate before repeating "
+        "a price this low.")
 
 # =============================================================
 # TAB 5: RENEWAL RISK
@@ -655,339 +757,450 @@ with tabs[4]:
     par = csv('usage_paradox.csv')
     rsk = csv('risk_summary.csv')
 
-    c = st.columns(4)
-    c[0].metric('Model accuracy (AUC)', f"{metrics['auc_model']:.2f}",
-                f"simple rule: {metrics['auc_baseline']:.2f}",
-                delta_color='off', delta_arrow='off')
-    c[1].metric('Lapse rate in top 20% flagged',
-                f"{metrics['lapse_in_top20_model']:.0%}",
-                f"average: {metrics['test_lapse_rate']:.0%}",
-                delta_color='off', delta_arrow='off')
-    c[2].metric('Active subscribers scored',
-                f"{rsk['subscribers'].sum():,}")
-    hi = rsk[rsk['risk_band'] == 'High']
-    c[3].metric('High risk', f"{hi['subscribers'].sum():,}",
-                f"{rs(hi['revenue_at_stake'].sum())} at stake",
-                delta_color='off', delta_arrow='off')
-    st.markdown(
-        "<span class='caveat'>Logistic regression on auto-pay "
-        "subscribers, trained on Jan to May and tested on Jun to Aug. "
-        "Manual payers are scored from their historical renewal rate. "
-        "AUC: 0.5 = coin flip, 1.0 = perfect.</span>",
-        unsafe_allow_html=True)
-
-    left, right = st.columns([3, 2])
+    st.markdown('#### 1. Can we predict who will leave?')
+    top20 = metrics['lapse_in_top20_model']
+    base_ = metrics['test_lapse_rate']
+    left, right = st.columns([2, 3])
     with left:
-        chart_title('What drives renewal (auto-pay subscribers)',
-                    'Odds ratio vs baseline: Easypaisa, Weekly, first '
-                    'subscription, Android, Lahore. Right = renews more.')
-        d = drv[(drv['p_value'] < 0.05)
-                & ~drv['driver'].str.contains('Renewed last time')].copy()
-        d['driver'] = d['driver'].str.replace(
-            'Number of past cycles (log)',
-            'More past renewals (per doubling)', regex=False)
-        d = d.sort_values('odds_ratio')
-        colors = [BRAND if r >= 1 else '#d95926' for r in d['odds_ratio']]
-        fig = go.Figure()
-        fig.add_bar(
-            y=d['driver'], x=d['odds_ratio'] - 1, base=1,
-            orientation='h', marker=dict(color=colors, cornerradius=4),
-            customdata=d['in_plain_english'],
-            hovertemplate='%{y}<br>%{customdata}<extra></extra>')
-        fig.add_vline(x=1, line=dict(color='#9AA0A6', width=1))
-        fig = style(fig, height=460, legend=False)
-        fig.update_xaxes(type='log', showgrid=True, gridcolor=GRID,
-                         tickvals=[0.1, 0.25, 0.5, 1, 2, 3],
-                         ticktext=['0.1x', '0.25x', '0.5x', '1x', '2x',
-                                   '3x'])
-        show(fig)
+        html(f"<div class='card'><div class='big'>"
+             f"{top20 * 100:.0f} out of 100</div><div class='sub'>"
+             "people the model flags as most at risk actually left "
+             f"(tested on June to August).<br><br>Picking people at "
+             f"random catches only <b>{base_ * 100:.0f} out of 100</b>. "
+             "So the model finds leavers about "
+             f"<b>{top20 / base_:.1f}x</b> better than guessing. "
+             "Useful, not perfect.</div></div>")
     with right:
-        chart_title('The usage paradox',
-                    'Renewal rate by history and early usage')
-        par['label'] = par['history'].replace({
-            'First sub': 'First subscription',
-            'Renewed last time': 'Renewed last time',
-            'Lapsed before': 'Lapsed before'})
         fig = go.Figure()
-        for flag, name, color in [(0, 'No use in first 5 days',
-                                   '#5f6b7a'),
-                                  (1, 'Used in first 5 days', BRAND)]:
-            dd = par[par['used_early'] == flag]
-            fig.add_bar(
-                x=dd['label'], y=dd['retained'], name=name,
-                marker=dict(color=color, cornerradius=4),
-                text=dd['retained'].map('{:.0%}'.format),
-                textposition='outside',
-                hovertemplate='%{x}: %{y:.0%} renew<extra></extra>')
-        fig.update_layout(barmode='group')
-        show(pct_axis(style(fig, height=460)))
-
-    chart_title('Active subscribers by risk level',
-                f"Everyone with a live subscription on {END:%b %d}")
-    band = rsk.groupby(['campaign', 'risk_band'])['subscribers'].sum()
-    band = band.unstack().reindex(columns=['High', 'Medium', 'Low'])
-    band = band.fillna(0)
-    bcol = {'High': '#d95926', 'Medium': '#c98500', 'Low': '#199e70'}
-    fig = go.Figure()
-    for b in ['High', 'Medium', 'Low']:
+        lbl = ['Random pick', 'Simple rule<br>(payment + package)',
+               'Our model<br>(top 20% risk)']
+        vals = [base_, metrics['lapse_in_top20_baseline'], top20]
         fig.add_bar(
-            y=band.index, x=band[b], name=f'{b} risk', orientation='h',
-            marker=dict(color=bcol[b], line=dict(width=2, color=BG)),
-            hovertemplate='%{y} · ' + b + ' risk: %{x:,}<extra></extra>')
-    fig.update_layout(barmode='stack')
-    show(style(fig, height=240))
+            x=lbl, y=vals, marker=dict(color=[GREY, GREY, BRAND],
+                                       cornerradius=4),
+            text=[f'{v * 100:.0f} in 100' for v in vals],
+            textposition='outside',
+            hovertemplate='%{x}: %{y:.0%} actually left<extra></extra>')
+        fig = style(fig, height=260, legend=False)
+        fig.update_yaxes(tickformat='.0%', range=[0, 0.7])
+        show(fig)
 
-    act = rsk.groupby('recommended_action').agg(
-        subscribers=('subscribers', 'sum'),
-        revenue=('revenue_at_stake', 'sum')).sort_values(
-        'subscribers', ascending=False).reset_index()
-    st.dataframe(
-        act.rename(columns={'recommended_action': 'Recommended action',
-                            'subscribers': 'Subscribers',
-                            'revenue': 'Current subscription value'}),
-        hide_index=True, width='stretch',
-        column_config={
-            'Current subscription value': st.column_config.NumberColumn(
-                format='Rs %,.0f'),
-            'Subscribers': st.column_config.NumberColumn(format='%,d')})
+    st.markdown('#### 2. What makes people leave or stay')
+    st.caption('Auto-pay subscribers. "3x" means three times as likely, '
+               'compared with a typical first-time Easypaisa Weekly '
+               'subscriber.')
+    names = {
+        'Bought a promo package (New Year/Eid/Ramadan)':
+            'Bought a promo package',
+        'History: Lapsed before': 'Stopped once before',
+        'Used an Ecom deal in first 5 days':
+            'First used an online (ecom) deal',
+        'Pays via Zong': 'Pays with Zong',
+        'Number of past cycles (log)':
+            'Has renewed many times before',
+        'Pays via Ufone': 'Pays with Ufone',
+        'Pays via JazzCash Checkout': 'Pays with JazzCash Checkout',
+        'Package: Long term': 'On a Quarterly or Half Yearly package',
+        'Package: Monthly': 'On a Monthly package',
+        'Used the subscription in first 5 days':
+            'Used it in the first 5 days',
+    }
+    d = drv[drv['driver'].isin(names) & (drv['p_value'] < 0.05)].copy()
+    d['label'] = d['driver'].map(names)
+    leave = d[d['odds_ratio'] < 1].sort_values('odds_ratio').head(5)
+    stay = d[d['odds_ratio'] > 1].sort_values(
+        'odds_ratio', ascending=False).head(5)
+    left, right = st.columns(2)
+    with left:
+        html(f"<div style='color:{RED};font-weight:600;margin-bottom:8px'>"
+             "⬇ More likely to LEAVE</div>")
+        for _, r in leave.iterrows():
+            html(f"<div class='reason'><span>{r['label']}</span>"
+                 f"<span class='x' style='color:{RED}'>"
+                 f"{1 / r['odds_ratio']:.1f}x</span></div>")
+    with right:
+        html(f"<div style='color:{GREEN};font-weight:600;"
+             "margin-bottom:8px'>⬆ More likely to STAY</div>")
+        for _, r in stay.iterrows():
+            html(f"<div class='reason'><span>{r['label']}</span>"
+                 f"<span class='x' style='color:{GREEN}'>"
+                 f"{r['odds_ratio']:.1f}x</span></div>")
 
     p = par.set_index(['history', 'used_early'])['retained']
     insight(
         "Auto payers who renewed last time and did NOT use the app "
-        f"renew {p[('Renewed last time', 0)]:.0%} of the time. Those who "
-        f"did use it renew {p[('Renewed last time', 1)]:.0%}.",
-        "The most 'loyal' auto payers are often the least engaged. "
-        "Their renewals are inertia, which is fragile.",
-        "Treat passive auto payers as a hidden risk segment, not a win "
-        "(see the Auto-Pay Simulator).")
-    insight(
-        "Past behaviour predicts renewal best: each doubling of past "
-        "renewals makes renewal 2.5x more likely, and someone who lapsed "
-        "once is 3.8x more likely to lapse again. Promo packages are "
-        "13.5x more likely to lapse.",
-        f"The model flags lapses {metrics['lapse_in_top20_model']:.0%} "
-        "of the time in its top 20%, vs "
-        f"{metrics['lapse_in_top20_baseline']:.0%} for a simple "
-        "payment-and-package rule. Useful, not perfect.",
-        "Work the High-risk list first, starting with those closest to "
-        "expiry (Target Lists tab).")
+        f"renewed {p[('Renewed last time', 0)]:.0%} of the time. Those "
+        f"who used it renewed {p[('Renewed last time', 1)]:.0%}.",
+        "Some of the most 'loyal' auto payers are simply not paying "
+        "attention. Their renewals are inertia, which is fragile.",
+        "Treat passive auto payers as a hidden risk, not a win.")
+
+    st.markdown(f'#### 3. Who is at risk right now ({END:%b %d})')
+    band = rsk.groupby('risk_band').agg(
+        subscribers=('subscribers', 'sum'),
+        value=('revenue_at_stake', 'sum'),
+        risk=('avg_lapse_risk', 'mean'))
+    wavg = rsk.assign(w=rsk['avg_lapse_risk'] * rsk['subscribers'])
+    wavg = wavg.groupby('risk_band')['w'].sum() / band['subscribers']
+    info = {'High': (RED, 'Most will leave', 'Act now'),
+            'Medium': (AMBER, 'Could go either way', 'Nudge'),
+            'Low': (GREEN, 'Likely to stay', 'Leave alone')}
+    cols = st.columns(3)
+    for col, b in zip(cols, ['High', 'Medium', 'Low']):
+        color, meaning, todo = info[b]
+        with col:
+            html(f"<div class='card' style='border-top:3px solid "
+                 f"{color}'><span class='pill' style='background:{color}'>"
+                 f"{b} risk</span><div class='big' style='margin-top:8px'>"
+                 f"{band.loc[b, 'subscribers']:,.0f}</div>"
+                 f"<div class='sub'>subscribers · "
+                 f"{rs(band.loc[b, 'value'])} current value<br>"
+                 f"About {wavg[b] * 10:.0f} in 10 expected to leave. "
+                 f"<b>{meaning}.</b> {todo}.</div></div>")
+
+    chart_title('What to do, and for how many people',
+                'Full names and numbers are in the Target Lists tab')
+    act = rsk.groupby(['recommended_action', 'risk_band'])[
+        'subscribers'].sum().unstack().reindex(
+        columns=['High', 'Medium', 'Low']).fillna(0)
+    act = act.loc[act.sum(axis=1).sort_values().index]
+    fig = go.Figure()
+    for b in ['High', 'Medium', 'Low']:
+        fig.add_bar(
+            y=act.index, x=act[b], name=f'{b} risk', orientation='h',
+            marker=dict(color=info[b][0], line=dict(width=2, color=BG)),
+            hovertemplate='%{y} · ' + b + ' risk: %{x:,}'
+                          '<extra></extra>')
+    fig.update_layout(barmode='stack')
+    show(style(fig, height=300))
 
 # =============================================================
-# TAB 6: AUTO-PAY SIMULATOR
+# TAB 6: REVENUE SIMULATOR
 # =============================================================
 with tabs[5]:
     sim = csv('simulator_inputs.csv').set_index('package').reindex(
         PKG_ORDER)
     pas = csv('passive_auto_payers.csv')
-    om = csv('overview_monthly.csv')
-    man = om[(om['payment_mode'] == 'Manual')
-             & (om['campaign'] == 'Regular')
-             & (om['month'] < '2026-08')]
-    n_months = man['month'].nunique()
-    man_pm = man.groupby('package')['subscriptions'].sum() / n_months
-    man_pm = man_pm.reindex(PKG_ORDER).fillna(0)
+    p79 = js('pkr79.json')
+    ra, rm = sim['retention_Auto'], sim['retention_Manual']
+    new_man = sim['new_per_month_Manual']
+    reg_p = pas[pas['campaign'] == 'Regular'].set_index(
+        'package').reindex(PKG_ORDER).fillna(0)
+    passive_month = sum(reg_p.loc[p, 'passive_payers'] * PRICE[p]
+                        * PER_MONTH[p] for p in PKG_ORDER)
 
-    st.markdown('#### Lever 1: Move manual payers to auto-pay')
-    s1, s2 = st.columns(2)
-    conv = s1.slider('% of new manual payers switched to auto-pay',
-                     0, 100, 20, 5, key='s_conv') / 100
-    real = s2.slider('How much of the auto-pay advantage they really '
-                     'get', 0, 100, 50, 10, key='s_real',
-                     help='Auto-pay users are partly more committed to '
-                          'begin with. 50% is a conservative '
-                          'assumption: a switched user gets half the '
-                          'renewal boost.') / 100
+    def lever_a(conv, real):
+        """Weekly manual payers moved to Monthly auto-pay."""
+        n = new_man['Weekly'] * 3 * conv
+        r_new = rm['Monthly'] + (ra['Monthly'] - rm['Monthly']) * real
+        gain = value_3m('Monthly', r_new) - value_3m('Weekly',
+                                                     rm['Weekly'])
+        return n, n * gain / 2
 
-    ra = sim['retention_Auto']
-    rm = sim['retention_Manual']
-    # expected number of future renewals = r / (1 - r)
-    future_auto = ra / (1 - ra)
-    future_man = rm / (1 - rm)
-    price = pd.Series(PRICE).reindex(PKG_ORDER)
-    switched = man_pm * conv
-    extra_per_user = (future_auto - future_man) * real * price
-    value = switched * extra_per_user
+    def lever_b(conv, real, pkgs=PKG_ORDER):
+        """Manual payers moved to auto-pay on the same package."""
+        tot_n, tot_v = 0, 0
+        for p in pkgs:
+            n = new_man[p] * 3 * conv
+            r_new = rm[p] + (ra[p] - rm[p]) * real
+            gain = value_3m(p, r_new) - value_3m(p, rm[p])
+            tot_n += n
+            tot_v += n * gain / 2
+        return tot_n, tot_v
 
-    c = st.columns(3)
-    c[0].metric('Manual payers switched per month',
-                f"{switched.sum():,.0f}")
-    c[1].metric('Extra revenue per month of switching',
-                rs(value.sum()))
-    c[2].metric('Per year', rs(value.sum() * 12))
+    def lever_c(cancel, save):
+        at_risk = passive_month * 3 * cancel
+        return at_risk, at_risk * save
 
-    chart_title('Extra revenue from one month of switching, by package',
-                'Future renewals they make that manual payers would not')
-    fig = go.Figure()
-    fig.add_bar(
-        x=PKG_ORDER, y=value.values,
-        marker=dict(color=[PKG_COLORS[p] for p in PKG_ORDER],
-                    cornerradius=4),
-        text=[rs(v) for v in value.values], textposition='outside',
-        customdata=list(zip(switched.round(0), extra_per_user.round(0))),
-        hovertemplate='%{x}: %{customdata[0]:,.0f} switched × '
-                      'Rs %{customdata[1]:,.0f} each<extra></extra>')
-    fig = style(fig, height=300, legend=False)
-    fig.update_yaxes(tickprefix='Rs ', tickformat='.2s')
-    show(fig)
-    with st.expander('How this is calculated'):
-        tbl = pd.DataFrame({
-            'New manual payers / month': man_pm.round(0),
-            'Auto renewal rate': ra, 'Manual renewal rate': rm,
-            'Price': price,
-            'Extra value per switched user': extra_per_user.round(0)})
-        st.dataframe(tbl, width='stretch', column_config={
-            'Auto renewal rate': st.column_config.NumberColumn(
-                format='percent'),
-            'Manual renewal rate': st.column_config.NumberColumn(
-                format='percent'),
-            'Price': st.column_config.NumberColumn(format='Rs %,.0f'),
-            'Extra value per switched user':
-                st.column_config.NumberColumn(format='Rs %,.0f')})
+    def lever_d(renew):
+        n = (p79['auto'] + p79['manual']) * renew
+        return n, n * value_3m('Monthly', ra['Monthly'])
+
+    st.markdown('#### What could these moves be worth in the next 3 '
+                'months?')
+    st.caption('Three ready-made scenarios. Conservative assumes few '
+               'people respond; Aggressive assumes a strong campaign.')
+    SCEN = {'Conservative': dict(a=0.10, b=0.10, real=0.3, cancel=0.25,
+                                 save=0.2, d=0.15),
+            'Expected': dict(a=0.20, b=0.20, real=0.5, cancel=0.25,
+                             save=0.35, d=0.25),
+            'Aggressive': dict(a=0.35, b=0.35, real=0.7, cancel=0.25,
+                               save=0.5, d=0.40)}
+    cols = st.columns(3)
+    for col, (name, s) in zip(cols, SCEN.items()):
+        va = lever_a(s['a'], s['real'])[1]
+        # Weekly manual payers are already in lever a
+        vb = lever_b(s['b'], s['real'], PKG_ORDER[1:])[1]
+        vc = lever_c(s['cancel'], s['save'])[1]
+        vd = lever_d(s['d'])[1]
+        color = {'Conservative': GREY, 'Expected': BRAND,
+                 'Aggressive': GREEN}[name]
+        with col:
+            html(f"<div class='card' style='border-top:3px solid "
+                 f"{color}'><h4>{name}</h4><div class='big'>"
+                 f"{rs(va + vb + vc)}</div><div class='sub'>"
+                 "extra or protected revenue in 3 months<br><br>"
+                 f"Weekly manual → Monthly auto: <b>{rs(va)}</b><br>"
+                 f"Other manual → auto-pay: <b>{rs(vb)}</b><br>"
+                 f"Passive payers kept: <b>{rs(vc)}</b><br><br>"
+                 f"PKR 79 buyers renewing at Rs 600 "
+                 f"({s['d']:.0%}): <b>{rs(vd)}</b></div></div>")
+    with st.expander('What each scenario assumes'):
+        st.dataframe(pd.DataFrame({
+            'Assumption': [
+                'Weekly manual payers who accept Monthly auto-pay',
+                'Monthly/Quarterly/Half Yearly manual payers who switch '
+                'to auto-pay',
+                'Share of the auto-pay renewal boost they really get',
+                'Passive auto payers who would cancel on noticing',
+                'Of those, how many an activation push keeps',
+                'PKR 79 buyers who renew at Rs 600']} | {
+            n: [f"{s['a']:.0%}", f"{s['b']:.0%}", f"{s['real']:.0%}",
+                f"{s['cancel']:.0%}", f"{s['save']:.0%}",
+                f"{s['d']:.0%}"] for n, s in SCEN.items()}),
+            hide_index=True, width='stretch')
         st.markdown(
-            "Expected future renewals = r ÷ (1 − r), where r is the "
-            "renewal rate. Extra value = (auto future renewals − manual "
-            "future renewals) × realisation % × price. Based on regular "
-            "packages, Jan to Jul.")
+            "Renewal rates come from Jan to Jul regular subscriptions: "
+            f"Monthly auto renews {ra['Monthly']:.0%} a month, Weekly "
+            f"manual {rm['Weekly']:.0%} a week. PKR 79 is shown "
+            "separately because it is a forecast, not a new action.")
 
-    st.markdown('#### Lever 2: The passive auto-pay risk')
-    reg_p = pas[pas['campaign'] == 'Regular'].set_index('package')
-    reg_p = reg_p.reindex(PKG_ORDER).fillna(0)
-    monthly_rev = reg_p['passive_payers'] * pd.Series(
-        {p: PRICE[p] * PER_MONTH[p] for p in PKG_ORDER})
-    cancel = st.slider('% of passive payers who cancel once they notice '
-                       'the charge', 0, 100, 25, 5, key='s_cancel') / 100
-    save = st.slider('% of those you win back with an activation '
-                     'campaign', 0, 100, 30, 5, key='s_save') / 100
-    at_risk = monthly_rev.sum() * cancel
-    c = st.columns(3)
-    c[0].metric('Passive auto payers (regular packages)',
-                f"{reg_p['passive_payers'].sum():,.0f}")
-    c[1].metric('Monthly revenue at risk', rs(at_risk))
-    c[2].metric('Protected by activation', rs(at_risk * save))
-    st.markdown(
-        f"<span class='caveat'>Passive = auto-pay subscription active on "
-        f"{END:%b %d} with no use so far in its current cycle. PKR 79 "
-        "users are excluded because their subscriptions just started."
-        "</span>", unsafe_allow_html=True)
+    st.divider()
+    st.markdown('#### Try your own numbers')
+    lever = st.radio(
+        'Pick a move', horizontal=True, key='s_lever',
+        options=['Weekly manual → Monthly auto',
+                 'Manual → auto (same package)',
+                 'Wake up passive auto payers',
+                 'PKR 79 renewals at Rs 600'])
 
-    insight(
-        "Manual payers barely renew, so every switch to auto-pay adds "
-        "future renewals. At the default settings (20% switched, half "
-        f"the boost) that is about {rs(value.sum())} a month.",
-        "This is a steady compounding gain, not a one-off spike. The "
-        "Weekly package drives most of it because it renews most often.",
-        "Offer a small first-week bonus for choosing wallet or carrier "
-        "auto-pay at checkout.")
-    insight(
-        f"{reg_p['passive_payers'].sum():,.0f} regular auto payers "
-        f"worth about {rs(monthly_rev.sum())} a month have not used "
-        "their current subscription.",
-        "This revenue exists because people haven't noticed, not "
-        "because they value it. It is the most fragile revenue on the "
-        "books.",
-        "Activate them before they notice: a personalised first-deal "
-        "push beats a cancellation and a complaint.")
+    left, right = st.columns([1, 1])
+    if lever == 'Weekly manual → Monthly auto':
+        with left:
+            conv = st.slider('% of Weekly manual payers who accept',
+                             0, 100, 20, 5, key='s_a') / 100
+            real = st.slider('% of the auto-pay renewal boost they get',
+                             0, 100, 50, 10, key='s_ar',
+                             help='Auto-pay users are partly more '
+                                  'committed to begin with, so a '
+                                  'switched user may not renew as '
+                                  'often. 50% is a cautious middle.'
+                             ) / 100
+        n, v = lever_a(conv, real)
+        before = new_man['Weekly'] * 3 * conv * value_3m(
+            'Weekly', rm['Weekly']) / 2
+        sentence = (f"Moving <b>{conv:.0%}</b> of Weekly manual payers "
+                    f"(about <b>{n:,.0f}</b> people over 3 months) to "
+                    f"Monthly auto-pay adds about <b>{rs(v)}</b>.")
+    elif lever == 'Manual → auto (same package)':
+        with left:
+            conv = st.slider('% of manual payers who switch to auto-pay',
+                             0, 100, 20, 5, key='s_b') / 100
+            real = st.slider('% of the auto-pay renewal boost they get',
+                             0, 100, 50, 10, key='s_br') / 100
+        n, v = lever_b(conv, real)
+        before = sum(new_man[p] * 3 * conv * value_3m(p, rm[p])
+                     for p in PKG_ORDER) / 2
+        sentence = (f"Switching <b>{conv:.0%}</b> of manual payers "
+                    f"(about <b>{n:,.0f}</b> people over 3 months) to "
+                    f"auto-pay adds about <b>{rs(v)}</b>.")
+    elif lever == 'Wake up passive auto payers':
+        with left:
+            cancel = st.slider('% of passive payers who would cancel '
+                               'once they notice', 0, 100, 25, 5,
+                               key='s_c') / 100
+            save = st.slider('% of those an activation push keeps',
+                             0, 100, 35, 5, key='s_cs') / 100
+        at_risk, v = lever_c(cancel, save)
+        before = at_risk
+        n = reg_p['passive_payers'].sum()
+        sentence = (f"<b>{n:,.0f}</b> auto payers haven't used their "
+                    f"current subscription. If <b>{cancel:.0%}</b> "
+                    f"cancel, <b>{rs(at_risk)}</b> is lost over 3 "
+                    f"months. An activation push keeping <b>{save:.0%}"
+                    f"</b> of them protects <b>{rs(v)}</b>.")
+    else:
+        with left:
+            renew = st.slider('% of PKR 79 buyers who renew at Rs 600',
+                              0, 100, 25, 5, key='s_d') / 100
+        n, v = lever_d(renew)
+        before = 0
+        sentence = (f"If <b>{renew:.0%}</b> of the "
+                    f"{p79['auto'] + p79['manual']:,} PKR 79 buyers "
+                    f"renew at Rs 600, that is <b>{n:,.0f}</b> "
+                    f"subscribers worth about <b>{rs(v)}</b> over 3 "
+                    f"months. {p79['used_any']:.0%} of them have used "
+                    "the subscription so far.")
+    with right:
+        html(f"<div class='card'><div class='sub' style='font-size:1rem;"
+             f"color:{TEXT};line-height:1.6'>{sentence}</div></div>")
+        if lever == 'Wake up passive auto payers':
+            lbl, vals = ['Lost if nothing is done', 'Protected by push'], \
+                [before, v]
+            colors = [RED, GREEN]
+        elif lever == 'PKR 79 renewals at Rs 600':
+            lbl, vals, colors = ['Revenue from renewals'], [v], [BRAND]
+        else:
+            lbl = ['Their revenue today', 'Revenue after the switch']
+            vals, colors = [before, before + v], [GREY, BRAND]
+        fig = go.Figure()
+        fig.add_bar(x=lbl, y=vals,
+                    marker=dict(color=colors, cornerradius=4),
+                    text=[rs(x_) for x_ in vals], textposition='outside',
+                    hovertemplate='%{x}: Rs %{y:,.0f}<extra></extra>')
+        fig = style(fig, height=260, legend=False)
+        fig.update_yaxes(tickprefix='Rs ', tickformat='.2s',
+                         range=[0, max(vals + [1]) * 1.25])
+        show(fig)
+    st.markdown("<span class='caveat'>3-month value = expected payments "
+                "over the next 3 months, using each package's renewal "
+                "rate. People switched part-way through the period are "
+                "counted for half the time on average.</span>",
+                unsafe_allow_html=True)
 
 # =============================================================
 # TAB 7: TARGET LISTS (password protected, reads Supabase)
 # =============================================================
 with tabs[6]:
-    st.markdown('#### Target lists and customer lookup')
-    st.caption('Names and phone numbers of active subscribers, ranked by '
-               'lapse risk. Password protected.')
+    st.markdown('#### Target lists and customer search')
+    st.caption('Active subscribers with name, phone and lapse risk. '
+               'Password protected.')
 
     if 'APP_PASSWORD' not in st.secrets or 'DB_URL' not in st.secrets:
-        st.info('Add DB_URL and APP_PASSWORD in the app Secrets to '
-                'enable this tab.')
-    else:
-        pw = st.text_input('Password', type='password', key='t_pw')
-        if pw != st.secrets['APP_PASSWORD']:
-            if pw:
-                st.error('Wrong password.')
+        st.warning('This tab needs two secrets. In Streamlit Cloud: '
+                   'your app → ⋮ → Settings → Secrets, then paste:')
+        st.code('DB_URL = "postgresql+psycopg2://postgres.PROJECT:'
+                'PASSWORD@HOST:6543/postgres"\n'
+                'APP_PASSWORD = "your-dashboard-password"', 'toml')
+        st.stop()
+
+    pw = st.text_input('Password', type='password', key='t_pw')
+    if pw != st.secrets['APP_PASSWORD']:
+        if pw:
+            st.error('Wrong password.')
+        st.stop()
+
+    @st.cache_data(ttl=3600, show_spinner='Loading list...')
+    def load_list():
+        from sqlalchemy import create_engine
+        eng = create_engine(st.secrets['DB_URL'])
+        return pd.read_sql('select * from retention_risk_list', eng)
+
+    try:
+        rl = load_list()
+    except Exception as e:
+        st.error('Could not reach Supabase. If the project is paused, '
+                 'open it in Supabase and click Restore. '
+                 f'({str(e)[:150]})')
+        st.stop()
+
+    ph = rl['phone'].astype(str).str.replace(r'\.0$', '', regex=True)
+    rl['phone'] = '0' + ph.str.replace(r'\D', '', regex=True).str.lstrip(
+        '0')
+    COLS = {'User_ID': 'User ID', 'User_Name': 'Name', 'phone': 'Phone',
+            'Subscription_Package': 'Package', 'campaign': 'Campaign',
+            'payment_mode': 'Payment', 'Transaction_Type': 'Method',
+            'city': 'City', 'end': 'Expires', 'days_to_expiry':
+            'Days to expiry', 'lapse_risk': 'Lapse risk',
+            'risk_band': 'Risk', 'reasons': 'Why',
+            'recommended_action': 'Action'}
+    view = rl[list(COLS)].rename(columns=COLS)
+    view['Expires'] = pd.to_datetime(view['Expires']).dt.strftime(
+        '%b %d, %Y')
+    risk_col = st.column_config.ProgressColumn(
+        'Lapse risk', format='percent', min_value=0, max_value=1)
+
+    def downloads(df, name):
+        c1, c2, _ = st.columns([1, 1, 3])
+        c1.download_button(
+            '⬇ Download CSV', df.to_csv(index=False).encode('utf-8'),
+            file_name=f'{name}.csv', mime='text/csv', type='primary',
+            key=f'csv_{name}')
+        buf = io.BytesIO()
+        with pd.ExcelWriter(buf, engine='openpyxl') as xw:
+            df.to_excel(xw, index=False, sheet_name='Target list')
+        c2.download_button(
+            '⬇ Download Excel', buf.getvalue(),
+            file_name=f'{name}.xlsx', key=f'xlsx_{name}',
+            mime='application/vnd.openxmlformats-officedocument.'
+                 'spreadsheetml.sheet')
+
+    part = st.radio('What do you want to do?', horizontal=True,
+                    key='t_part',
+                    options=['🔍 Search a customer', '📋 Build a list'])
+
+    if part == '🔍 Search a customer':
+        q = st.text_input('Type a name, phone number or user ID',
+                          key='t_q', placeholder='e.g. 03001234567')
+        if q:
+            ql = q.strip().lower()
+            qd = ql.lstrip('0').replace('-', '').replace(' ', '')
+            hit = (view['Name'].astype(str).str.lower().str.contains(
+                       ql, regex=False)
+                   | view['Phone'].str.contains(qd, regex=False)
+                   | view['User ID'].astype(str).str.contains(
+                       qd, regex=False))
+            res = view[hit]
+            st.caption(f'{len(res):,} match(es)')
+            if len(res) == 1:
+                r = res.iloc[0]
+                color = {'High': RED, 'Medium': AMBER,
+                         'Low': GREEN}.get(r['Risk'], GREY)
+                html(f"<div class='card' style='border-top:3px solid "
+                     f"{color}'><h4>{r['Name']} · {r['Phone']}</h4>"
+                     f"<span class='pill' style='background:{color}'>"
+                     f"{r['Risk']} risk · {r['Lapse risk']:.0%}</span>"
+                     f"<div class='sub' style='margin-top:10px'>"
+                     f"{r['Package']} ({r['Campaign']}) · {r['Payment']} "
+                     f"via {r['Method']} · {r['City']}<br>Expires "
+                     f"{r['Expires']} ({r['Days to expiry']:.0f} days)"
+                     f"<br><b>Why:</b> {r['Why']}<br><b>Do this:</b> "
+                     f"{r['Action']}</div></div>")
+            st.dataframe(res, hide_index=True, width='stretch',
+                         column_config={'Lapse risk': risk_col})
+            if len(res):
+                downloads(res, 'customer_search')
         else:
-            @st.cache_data(ttl=3600, show_spinner='Loading list...')
-            def load_list():
-                from sqlalchemy import create_engine
-                eng = create_engine(st.secrets['DB_URL'])
-                return pd.read_sql('select * from retention_risk_list',
-                                   eng)
+            st.caption('Only active subscribers (live subscription on '
+                       f'{END:%b %d}) are searchable.')
+    else:
+        f1, f2, f3, f4 = st.columns(4)
+        bands = f1.multiselect('Risk', ['High', 'Medium', 'Low'],
+                               default=['High'], key='t_b')
+        modes = f2.multiselect('Payment', ['Auto', 'Manual'],
+                               default=['Auto', 'Manual'], key='t_m')
+        camps = f3.multiselect(
+            'Campaign', sorted(view['Campaign'].unique()),
+            default=sorted(view['Campaign'].unique()), key='t_c')
+        maxd = int(view['Days to expiry'].max())
+        days = f4.slider('Expires within (days)', 0, maxd, 7, key='t_d')
+        f5, f6, f7 = st.columns([2, 1, 1])
+        acts = f5.multiselect(
+            'Action', sorted(view['Action'].unique()),
+            default=sorted(view['Action'].unique()), key='t_a')
+        pkgs = f6.multiselect(
+            'Package', sorted(view['Package'].unique()),
+            default=sorted(view['Package'].unique()), key='t_p')
+        top_c = view['City'].value_counts().head(15).index.tolist()
+        cty = f7.selectbox('City', ['All'] + top_c, key='t_city')
 
-            try:
-                rl = load_list()
-            except Exception as e:
-                st.error('Could not reach Supabase. If the project is '
-                         'paused, open it in Supabase and click Restore. '
-                         f'({str(e)[:150]})')
-                st.stop()
-
-            ph = rl['phone'].astype(str).str.replace(r'\.0$', '',
-                                                     regex=True)
-            rl['phone'] = '0' + ph.str.replace(r'\D', '',
-                                               regex=True).str.lstrip('0')
-            f1, f2, f3, f4 = st.columns(4)
-            bands = f1.multiselect('Risk', ['High', 'Medium', 'Low'],
-                                   default=['High'], key='t_b')
-            modes = f2.multiselect('Payment', ['Auto', 'Manual'],
-                                   default=['Auto', 'Manual'], key='t_m')
-            camps = f3.multiselect(
-                'Campaign', sorted(rl['campaign'].unique()),
-                default=sorted(rl['campaign'].unique()), key='t_c')
-            maxd = int(rl['days_to_expiry'].max())
-            days = f4.slider('Expires within (days)', 0, maxd, 7,
-                             key='t_d')
-            f5, f6 = st.columns(2)
-            acts = f5.multiselect(
-                'Action', sorted(rl['recommended_action'].unique()),
-                default=sorted(rl['recommended_action'].unique()),
-                key='t_a')
-            q = f6.text_input('Search name, phone or user ID', key='t_q')
-
-            out = rl[rl['risk_band'].isin(bands)
-                     & rl['payment_mode'].isin(modes)
-                     & rl['campaign'].isin(camps)
-                     & (rl['days_to_expiry'] <= days)
-                     & rl['recommended_action'].isin(acts)]
-            if q:
-                ql = q.strip().lower().lstrip('0')
-                hit = (rl['User_Name'].astype(str).str.lower()
-                       .str.contains(ql, regex=False)
-                       | rl['phone'].str.contains(ql, regex=False)
-                       | rl['User_ID'].astype(str).str.contains(
-                           ql, regex=False))
-                out = rl[hit]
-                st.caption('Search ignores the filters above.')
-
-            out = out.sort_values(['days_to_expiry', 'lapse_risk'],
-                                  ascending=[True, False])
-            c = st.columns(3)
-            c[0].metric('People in this list', f"{len(out):,}")
-            c[1].metric('Current subscription value',
-                        rs(out['price'].sum()))
-            c[2].metric('Average lapse risk',
-                        f"{out['lapse_risk'].mean():.0%}"
-                        if len(out) else '-')
-            cols = ['User_ID', 'User_Name', 'phone',
-                    'Subscription_Package', 'campaign', 'payment_mode',
-                    'Transaction_Type', 'city', 'days_to_expiry',
-                    'lapse_risk', 'risk_band', 'reasons',
-                    'recommended_action']
-            nice = {'User_ID': 'User ID', 'User_Name': 'Name',
-                    'phone': 'Phone', 'Subscription_Package': 'Package',
-                    'campaign': 'Campaign', 'payment_mode': 'Payment',
-                    'Transaction_Type': 'Method', 'city': 'City',
-                    'days_to_expiry': 'Days to expiry',
-                    'risk_band': 'Risk', 'reasons': 'Why',
-                    'recommended_action': 'Action'}
-            st.dataframe(
-                out[cols].rename(columns=nice), hide_index=True,
-                width='stretch', height=420,
-                column_config={
-                    'lapse_risk': st.column_config.ProgressColumn(
-                        'Lapse risk', format='percent',
-                        min_value=0, max_value=1)})
-            st.download_button(
-                'Download this list (CSV)',
-                out[cols].rename(columns=nice).to_csv(
-                    index=False).encode('utf-8'),
-                file_name=f'target_list_{END:%Y%m%d}.csv',
-                mime='text/csv', type='primary')
+        out = view[view['Risk'].isin(bands)
+                   & view['Payment'].isin(modes)
+                   & view['Campaign'].isin(camps)
+                   & (view['Days to expiry'] <= days)
+                   & view['Action'].isin(acts)
+                   & view['Package'].isin(pkgs)]
+        if cty != 'All':
+            out = out[out['City'] == cty]
+        out = out.sort_values(['Days to expiry', 'Lapse risk'],
+                              ascending=[True, False])
+        c = st.columns(3)
+        c[0].metric('People in this list', f"{len(out):,}")
+        c[1].metric('Average lapse risk',
+                    f"{out['Lapse risk'].mean():.0%}" if len(out)
+                    else '-')
+        c[2].metric('Expiring in the next 3 days',
+                    f"{(out['Days to expiry'] <= 3).sum():,}")
+        st.dataframe(out, hide_index=True, width='stretch', height=420,
+                     column_config={'Lapse risk': risk_col})
+        downloads(out, f'target_list_{END:%Y%m%d}')
