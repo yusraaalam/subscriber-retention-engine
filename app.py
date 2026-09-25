@@ -39,7 +39,7 @@ PER_MONTH = {'Weekly': 4.33, 'Monthly': 1, 'Quarterly': 1 / 3,
 
 st.markdown("""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Unbounded:wght@700;800&family=JetBrains+Mono:wght@500;700&display=swap');
 html, body, [class*="css"], .stMarkdown, .stMetric, button, input {
   font-family: 'Inter', sans-serif !important; }
 .block-container { padding-top: 1.5rem; max-width: 1300px; }
@@ -74,6 +74,56 @@ div[data-testid="stMetricLabel"] p { color: #9AA0A6;
 .pill { display: inline-block; padding: 2px 10px; border-radius: 99px;
   font-size: 0.75rem; font-weight: 600; }
 button[data-baseweb="tab"] p { font-size: 0.95rem; font-weight: 600; }
+.wi-title { font-family: 'Unbounded', 'Inter', sans-serif;
+  font-weight: 700; font-size: 1.45rem; color: #F1F5F9; }
+.wi-sub { color: #9FB3BF; font-size: 0.95rem; margin: 4px 0 12px 0;
+  max-width: 560px; }
+.wi-tag { display: inline-block; border: 1px solid #7a6420;
+  color: #F6C343; border-radius: 99px; padding: 4px 14px;
+  font-family: 'JetBrains Mono', monospace; font-size: 0.75rem;
+  letter-spacing: 0.08em; margin-bottom: 14px; }
+.st-key-whatif { background: linear-gradient(160deg, #0d1c24 0%,
+  #09131a 100%); border: 1px solid #1d3a44; border-radius: 22px;
+  padding: 28px 30px 20px 30px; }
+.st-key-whatif [data-testid="stWidgetLabel"] p { color: #B7C7D1;
+  font-size: 0.95rem; }
+.st-key-whatif [data-testid="stSliderThumbValue"] { color: #46E0C8;
+  font-family: 'JetBrains Mono', monospace; font-weight: 700; }
+.st-key-whatif [role="radiogroup"] { gap: 8px; flex-wrap: wrap; }
+.st-key-whatif button[data-variant="segmented_control"] {
+  border-radius: 99px !important; border: 1px solid #25444f !important;
+  background: #0f1d25 !important; padding: 8px 18px !important; }
+.st-key-whatif button[data-variant="segmented_control"] p {
+  color: #B7C7D1 !important; }
+.st-key-whatif button[data-variant="segmented_control"][aria-checked="true"] {
+  background: linear-gradient(135deg, #46E0C8, #0064DC) !important;
+  border-color: transparent !important; }
+.st-key-whatif button[data-variant="segmented_control"][aria-checked="true"] p {
+  color: #06121a !important; font-weight: 600; }
+.st-key-whatif [data-testid="stSlider"] div[style*="translate(-50%"] {
+  background: #46E0C8 !important;
+  box-shadow: 0 0 0 5px rgba(70,224,200,0.18); }
+.wi-sentence { background: rgba(255,255,255,0.03);
+  border: 1px solid #1d3a44; border-radius: 14px; padding: 14px 16px;
+  color: #E6EEF2; line-height: 1.6; margin-top: 10px; }
+.wi-gauge { position: relative; width: 250px; height: 250px;
+  margin: 0 auto; }
+.wi-center { position: absolute; inset: 0; display: flex;
+  flex-direction: column; align-items: center; justify-content: center;
+  text-align: center; }
+.wi-big { font-family: 'Unbounded', 'Inter', sans-serif; font-weight: 800;
+  font-size: 1.9rem; color: #F6C343; line-height: 1.1; }
+.wi-lbl { font-family: 'JetBrains Mono', monospace; font-size: 0.7rem;
+  letter-spacing: 0.1em; color: #F6C343; margin-top: 6px; }
+.wi-ring { color: #7fa3b3; font-size: 0.8rem; margin-top: 4px; }
+.wi-bars { max-width: 360px; margin: 14px auto 0 auto; }
+.wi-row { display: flex; justify-content: space-between;
+  color: #B7C7D1; font-size: 0.85rem; margin-top: 8px; }
+.wi-row b { color: #F1F5F9; }
+.wi-track { height: 8px; background: #16252f; border-radius: 99px;
+  overflow: hidden; margin-top: 4px; }
+.wi-track div { height: 100%; border-radius: 99px; }
+.wi-foot { color: #6f8a97; font-size: 0.78rem; margin-top: 16px; }
 </style>""", unsafe_allow_html=True)
 
 
@@ -983,97 +1033,119 @@ with tabs[5]:
             "separately because it is a forecast, not a new action.")
 
     st.divider()
-    st.markdown('#### Try your own numbers')
-    lever = st.radio(
-        'Pick a move', horizontal=True, key='s_lever',
-        options=['Weekly manual → Monthly auto',
-                 'Manual → auto (same package)',
-                 'Wake up passive auto payers',
-                 'PKR 79 renewals at Rs 600'])
+    with st.container(key='whatif'):
+        html("<div class='wi-title'>Revenue what-if calculator</div>"
+             "<div class='wi-sub'>Pick a move, drag the sliders and watch "
+             "the 3-month revenue change.</div>"
+             "<span class='wi-tag'>3-MONTH ESTIMATE</span>")
+        MOVES = {'Weekly manual → Monthly auto': 'a',
+                 'Manual → auto (same package)': 'b',
+                 'Wake up passive auto payers': 'c',
+                 'PKR 79 renewals at Rs 600': 'd'}
+        lever = st.segmented_control(
+            'Pick a move', list(MOVES), default=list(MOVES)[0],
+            key='s_lever', label_visibility='collapsed') or list(MOVES)[0]
+        mv = MOVES[lever]
+        left, right = st.columns([1.15, 1], gap='large')
+        with left:
+            if mv == 'a':
+                ring = st.slider('Weekly manual payers who accept (%)',
+                                 0, 100, 20, 5, key='s_a') / 100
+                real = st.slider(
+                    'Share of the auto-pay renewal boost they get (%)',
+                    0, 100, 50, 10, key='s_ar',
+                    help='Auto-pay users are partly more committed to '
+                         'begin with, so a switched user may not renew '
+                         'as often. 50% is a cautious middle.') / 100
+                n, v = lever_a(ring, real)
+                before = new_man['Weekly'] * 3 * ring * value_3m(
+                    'Weekly', rm['Weekly']) / 2
+                sentence = (f"Moving <b>{ring:.0%}</b> of Weekly manual "
+                            f"payers (about <b>{n:,.0f}</b> people over 3 "
+                            f"months) to Monthly auto-pay adds about "
+                            f"<b>{rs(v)}</b>.")
+                bars = [('Their revenue today', before, GREY),
+                        ('After the switch', before + v, BRAND)]
+                big_lbl, ring_lbl = 'EXTRA IN 3 MONTHS', 'switched'
+            elif mv == 'b':
+                ring = st.slider('Manual payers who switch to auto-pay (%)',
+                                 0, 100, 20, 5, key='s_b') / 100
+                real = st.slider(
+                    'Share of the auto-pay renewal boost they get (%)',
+                    0, 100, 50, 10, key='s_br') / 100
+                n, v = lever_b(ring, real)
+                before = sum(new_man[p] * 3 * ring * value_3m(p, rm[p])
+                             for p in PKG_ORDER) / 2
+                sentence = (f"Switching <b>{ring:.0%}</b> of manual payers "
+                            f"(about <b>{n:,.0f}</b> people over 3 months) "
+                            f"to auto-pay adds about <b>{rs(v)}</b>.")
+                bars = [('Their revenue today', before, GREY),
+                        ('After the switch', before + v, BRAND)]
+                big_lbl, ring_lbl = 'EXTRA IN 3 MONTHS', 'switched'
+            elif mv == 'c':
+                cancel = st.slider('Passive payers who would cancel once '
+                                   'they notice (%)', 0, 100, 25, 5,
+                                   key='s_c') / 100
+                ring = st.slider('Of those, kept by an activation push (%)',
+                                 0, 100, 35, 5, key='s_cs') / 100
+                at_risk, v = lever_c(cancel, ring)
+                n = reg_p['passive_payers'].sum()
+                sentence = (f"<b>{n:,.0f}</b> auto payers haven't used "
+                            f"their current subscription. If "
+                            f"<b>{cancel:.0%}</b> cancel, <b>{rs(at_risk)}"
+                            f"</b> is lost over 3 months. An activation "
+                            f"push keeping <b>{ring:.0%}</b> of them "
+                            f"protects <b>{rs(v)}</b>.")
+                bars = [('Lost if nothing is done', at_risk, RED),
+                        ('Protected by the push', v, GREEN)]
+                big_lbl, ring_lbl = 'PROTECTED IN 3 MONTHS', 'kept'
+            else:
+                ring = st.slider('PKR 79 buyers who renew at Rs 600 (%)',
+                                 0, 100, 25, 5, key='s_d') / 100
+                n, v = lever_d(ring)
+                sentence = (f"If <b>{ring:.0%}</b> of the "
+                            f"{p79['auto'] + p79['manual']:,} PKR 79 "
+                            f"buyers renew at Rs 600, that is <b>{n:,.0f}"
+                            f"</b> subscribers worth about <b>{rs(v)}</b> "
+                            f"over 3 months. {p79['used_any']:.0%} of them "
+                            "have used the subscription so far.")
+                bars = [('Revenue from renewals', v, BRAND)]
+                big_lbl, ring_lbl = 'FROM RENEWALS', 'renew'
+            html(f"<div class='wi-sentence'>{sentence}</div>")
 
-    left, right = st.columns([1, 1])
-    if lever == 'Weekly manual → Monthly auto':
-        with left:
-            conv = st.slider('% of Weekly manual payers who accept',
-                             0, 100, 20, 5, key='s_a') / 100
-            real = st.slider('% of the auto-pay renewal boost they get',
-                             0, 100, 50, 10, key='s_ar',
-                             help='Auto-pay users are partly more '
-                                  'committed to begin with, so a '
-                                  'switched user may not renew as '
-                                  'often. 50% is a cautious middle.'
-                             ) / 100
-        n, v = lever_a(conv, real)
-        before = new_man['Weekly'] * 3 * conv * value_3m(
-            'Weekly', rm['Weekly']) / 2
-        sentence = (f"Moving <b>{conv:.0%}</b> of Weekly manual payers "
-                    f"(about <b>{n:,.0f}</b> people over 3 months) to "
-                    f"Monthly auto-pay adds about <b>{rs(v)}</b>.")
-    elif lever == 'Manual → auto (same package)':
-        with left:
-            conv = st.slider('% of manual payers who switch to auto-pay',
-                             0, 100, 20, 5, key='s_b') / 100
-            real = st.slider('% of the auto-pay renewal boost they get',
-                             0, 100, 50, 10, key='s_br') / 100
-        n, v = lever_b(conv, real)
-        before = sum(new_man[p] * 3 * conv * value_3m(p, rm[p])
-                     for p in PKG_ORDER) / 2
-        sentence = (f"Switching <b>{conv:.0%}</b> of manual payers "
-                    f"(about <b>{n:,.0f}</b> people over 3 months) to "
-                    f"auto-pay adds about <b>{rs(v)}</b>.")
-    elif lever == 'Wake up passive auto payers':
-        with left:
-            cancel = st.slider('% of passive payers who would cancel '
-                               'once they notice', 0, 100, 25, 5,
-                               key='s_c') / 100
-            save = st.slider('% of those an activation push keeps',
-                             0, 100, 35, 5, key='s_cs') / 100
-        at_risk, v = lever_c(cancel, save)
-        before = at_risk
-        n = reg_p['passive_payers'].sum()
-        sentence = (f"<b>{n:,.0f}</b> auto payers haven't used their "
-                    f"current subscription. If <b>{cancel:.0%}</b> "
-                    f"cancel, <b>{rs(at_risk)}</b> is lost over 3 "
-                    f"months. An activation push keeping <b>{save:.0%}"
-                    f"</b> of them protects <b>{rs(v)}</b>.")
-    else:
-        with left:
-            renew = st.slider('% of PKR 79 buyers who renew at Rs 600',
-                              0, 100, 25, 5, key='s_d') / 100
-        n, v = lever_d(renew)
-        before = 0
-        sentence = (f"If <b>{renew:.0%}</b> of the "
-                    f"{p79['auto'] + p79['manual']:,} PKR 79 buyers "
-                    f"renew at Rs 600, that is <b>{n:,.0f}</b> "
-                    f"subscribers worth about <b>{rs(v)}</b> over 3 "
-                    f"months. {p79['used_any']:.0%} of them have used "
-                    "the subscription so far.")
-    with right:
-        html(f"<div class='card'><div class='sub' style='font-size:1rem;"
-             f"color:{TEXT};line-height:1.6'>{sentence}</div></div>")
-        if lever == 'Wake up passive auto payers':
-            lbl, vals = ['Lost if nothing is done', 'Protected by push'], \
-                [before, v]
-            colors = [RED, GREEN]
-        elif lever == 'PKR 79 renewals at Rs 600':
-            lbl, vals, colors = ['Revenue from renewals'], [v], [BRAND]
-        else:
-            lbl = ['Their revenue today', 'Revenue after the switch']
-            vals, colors = [before, before + v], [GREY, BRAND]
-        fig = go.Figure()
-        fig.add_bar(x=lbl, y=vals,
-                    marker=dict(color=colors, cornerradius=4),
-                    text=[rs(x_) for x_ in vals], textposition='outside',
-                    hovertemplate='%{x}: Rs %{y:,.0f}<extra></extra>')
-        fig = style(fig, height=260, legend=False)
-        fig.update_yaxes(tickprefix='Rs ', tickformat='.2s',
-                         range=[0, max(vals + [1]) * 1.25])
-        show(fig)
-    st.markdown("<span class='caveat'>3-month value = expected payments "
-                "over the next 3 months, using each package's renewal "
-                "rate. People switched part-way through the period are "
-                "counted for half the time on average.</span>",
-                unsafe_allow_html=True)
+        with right:
+            circ = 2 * 3.14159 * 92
+            arc = max(ring, 0.001) * circ
+            top = max(b_[1] for b_ in bars) or 1
+            rows = ''.join(
+                f"<div class='wi-row'><span>{lb}</span><b>{rs(val)}</b>"
+                f"</div><div class='wi-track'><div style='width:"
+                f"{val / top * 100:.1f}%;background:{col}'></div></div>"
+                for lb, val, col in bars)
+            html(f"""
+<div class='wi-gauge'>
+ <svg viewBox='0 0 220 220' width='250' height='250'>
+  <defs><linearGradient id='wig' x1='0' y1='0' x2='1' y2='1'>
+   <stop offset='0' stop-color='#0064DC'/>
+   <stop offset='1' stop-color='#46E0C8'/></linearGradient></defs>
+  <circle cx='110' cy='110' r='92' fill='none' stroke='#16252f'
+   stroke-width='16'/>
+  <circle cx='110' cy='110' r='92' fill='none' stroke='url(#wig)'
+   stroke-width='16' stroke-linecap='round'
+   stroke-dasharray='{arc:.1f} {circ:.1f}'
+   transform='rotate(-90 110 110)'/>
+ </svg>
+ <div class='wi-center'>
+  <div class='wi-big'>{rs(v).replace('Rs ', 'Rs&nbsp;')}</div>
+  <div class='wi-lbl'>{big_lbl}</div>
+  <div class='wi-ring'>{ring:.0%} {ring_lbl}</div>
+ </div>
+</div>
+<div class='wi-bars'>{rows}</div>""")
+        html("<div class='wi-foot'>3-month value = expected payments over "
+             "the next 3 months, using each package's renewal rate. People "
+             "switched part-way through the period are counted for half "
+             "the time on average.</div>")
 
 # =============================================================
 # TAB 7: TARGET LISTS (password protected, reads Supabase)
