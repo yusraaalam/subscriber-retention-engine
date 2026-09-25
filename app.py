@@ -925,21 +925,6 @@ with tabs[4]:
                  f"About {wavg[b] * 10:.0f} in 10 expected to leave. "
                  f"<b>{meaning}.</b> {todo}.</div></div>")
 
-    chart_title('What to do, and for how many people',
-                'Full names and numbers are in the Target Lists tab')
-    act = rsk.groupby(['recommended_action', 'risk_band'])[
-        'subscribers'].sum().unstack().reindex(
-        columns=['High', 'Medium', 'Low']).fillna(0)
-    act = act.loc[act.sum(axis=1).sort_values().index]
-    fig = go.Figure()
-    for b in ['High', 'Medium', 'Low']:
-        fig.add_bar(
-            y=act.index, x=act[b], name=f'{b} risk', orientation='h',
-            marker=dict(color=info[b][0], line=dict(width=2, color=BG)),
-            hovertemplate='%{y} · ' + b + ' risk: %{x:,}'
-                          '<extra></extra>')
-    fig.update_layout(barmode='stack')
-    show(style(fig, height=300))
 
 # =============================================================
 # TAB 6: REVENUE SIMULATOR
@@ -983,56 +968,6 @@ with tabs[5]:
         n = (p79['auto'] + p79['manual']) * renew
         return n, n * value_3m('Monthly', ra['Monthly'])
 
-    st.markdown('#### What could these moves be worth in the next 3 '
-                'months?')
-    st.caption('Three ready-made scenarios. Conservative assumes few '
-               'people respond; Aggressive assumes a strong campaign.')
-    SCEN = {'Conservative': dict(a=0.10, b=0.10, real=0.3, cancel=0.25,
-                                 save=0.2, d=0.15),
-            'Expected': dict(a=0.20, b=0.20, real=0.5, cancel=0.25,
-                             save=0.35, d=0.25),
-            'Aggressive': dict(a=0.35, b=0.35, real=0.7, cancel=0.25,
-                               save=0.5, d=0.40)}
-    cols = st.columns(3)
-    for col, (name, s) in zip(cols, SCEN.items()):
-        va = lever_a(s['a'], s['real'])[1]
-        # Weekly manual payers are already in lever a
-        vb = lever_b(s['b'], s['real'], PKG_ORDER[1:])[1]
-        vc = lever_c(s['cancel'], s['save'])[1]
-        vd = lever_d(s['d'])[1]
-        color = {'Conservative': GREY, 'Expected': BRAND,
-                 'Aggressive': GREEN}[name]
-        with col:
-            html(f"<div class='card' style='border-top:3px solid "
-                 f"{color}'><h4>{name}</h4><div class='big'>"
-                 f"{rs(va + vb + vc)}</div><div class='sub'>"
-                 "extra or protected revenue in 3 months<br><br>"
-                 f"Weekly manual → Monthly auto: <b>{rs(va)}</b><br>"
-                 f"Other manual → auto-pay: <b>{rs(vb)}</b><br>"
-                 f"Passive payers kept: <b>{rs(vc)}</b><br><br>"
-                 f"PKR 79 buyers renewing at Rs 600 "
-                 f"({s['d']:.0%}): <b>{rs(vd)}</b></div></div>")
-    with st.expander('What each scenario assumes'):
-        st.dataframe(pd.DataFrame({
-            'Assumption': [
-                'Weekly manual payers who accept Monthly auto-pay',
-                'Monthly/Quarterly/Half Yearly manual payers who switch '
-                'to auto-pay',
-                'Share of the auto-pay renewal boost they really get',
-                'Passive auto payers who would cancel on noticing',
-                'Of those, how many an activation push keeps',
-                'PKR 79 buyers who renew at Rs 600']} | {
-            n: [f"{s['a']:.0%}", f"{s['b']:.0%}", f"{s['real']:.0%}",
-                f"{s['cancel']:.0%}", f"{s['save']:.0%}",
-                f"{s['d']:.0%}"] for n, s in SCEN.items()}),
-            hide_index=True, width='stretch')
-        st.markdown(
-            "Renewal rates come from Jan to Jul regular subscriptions: "
-            f"Monthly auto renews {ra['Monthly']:.0%} a month, Weekly "
-            f"manual {rm['Weekly']:.0%} a week. PKR 79 is shown "
-            "separately because it is a forecast, not a new action.")
-
-    st.divider()
     with st.container(key='whatif'):
         html("<div class='wi-title'>Revenue what-if calculator</div>"
              "<div class='wi-sub'>Pick a move, drag the sliders and watch "
